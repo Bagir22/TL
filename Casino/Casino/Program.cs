@@ -37,6 +37,7 @@ while (operation != Operation.Exit)
     operation = ReadOperation();
     HandleOperation(operation, ref balance);
 }
+
 static void PrintGameName(string gameName)
 {
     Console.WriteLine(gameName);
