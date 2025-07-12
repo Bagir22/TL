@@ -10,102 +10,102 @@ struct OrderData
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main( string[] args )
     {
         Run();
     }
 
-    private static void PrintConfirmedOrder(OrderData order)
+    private static void PrintConfirmedOrder( OrderData order )
     {
-        Console.WriteLine($"{order.Username}! " +
-                          $"Ваш заказ {order.ItemName} в количестве {order.ItemQuantity} оформлен! " +
-                          $"Ожидайте доставку по адресу {order.UserAddress} к {DateTime.Now.AddDays(3).Date.ToShortDateString()}");
+        Console.WriteLine( $"{order.Username}! " +
+                           $"Ваш заказ {order.ItemName} в количестве {order.ItemQuantity} оформлен! " +
+                           $"Ожидайте доставку по адресу {order.UserAddress} к {DateTime.Now.AddDays( 3 ).Date.ToShortDateString()}" );
     }
 
-    private static bool IsOrderConfimerd(OrderData order)
+    private static bool IsOrderConfimerd( OrderData order )
     {
-        Console.WriteLine($"Здравствуйте, {order.Username}, " +
-                          $"вы заказали {order.ItemQuantity} {order.ItemName} " +
-                          $"на адрес {order.UserAddress}, все верно?");
-        
-        return AskUser("Заказ правильный? Введите: Да/Нет");
+        Console.WriteLine( $"Здравствуйте, {order.Username}, " +
+                           $"вы заказали {order.ItemQuantity} {order.ItemName} " +
+                           $"на адрес {order.UserAddress}, все верно?" );
+
+        return AskUser( "Заказ правильный? Введите: Да/Нет" );
     }
-    
+
     private static OrderData CreateOrder()
     {
         OrderData order = new OrderData();
 
-        Console.WriteLine("Заполните данные для заказа:");  
-        
-        order.ItemName = GetStringFromUser("Название товара");
-        order.ItemQuantity = GetIntFromUser("Количество товара");
-        order.Username = GetStringFromUser("Имя пользователя");
-        order.UserAddress = GetStringFromUser("Адрес доставки");
-        
+        Console.WriteLine( "Заполните данные для заказа:" );
+
+        order.ItemName = GetStringFromUser( "Название товара" );
+        order.ItemQuantity = GetIntFromUser( "Количество товара" );
+        order.Username = GetStringFromUser( "Имя пользователя" );
+        order.UserAddress = GetStringFromUser( "Адрес доставки" );
+
         return order;
     }
 
-    private static string GetStringFromUser(string messageToUser)
+    private static string GetStringFromUser( string messageToUser )
     {
         string userInput = "";
 
-        while (string.IsNullOrWhiteSpace(userInput))
+        while ( string.IsNullOrWhiteSpace( userInput ) )
         {
-            Console.Write($"{messageToUser}: ");
+            Console.Write( $"{messageToUser}: " );
             userInput = Console.ReadLine();
         }
 
         return userInput;
     }
-    
-    private static int GetIntFromUser(string messageToUser)
+
+    private static int GetIntFromUser( string messageToUser )
     {
         int number;
 
-        while (true)
+        while ( true )
         {
-            Console.Write($"{messageToUser}: ");
+            Console.Write( $"{messageToUser}: " );
             string userInput = Console.ReadLine();
 
-            if (int.TryParse(userInput, out number) && number >= 0)
+            if ( int.TryParse( userInput, out number ) && number >= 0 )
             {
                 return number;
             }
         }
     }
-    
-    private static bool AskUser(string messageToUser)
+
+    private static bool AskUser( string messageToUser )
     {
-        Console.WriteLine(messageToUser);
-        while (true)
+        Console.WriteLine( messageToUser );
+        while ( true )
         {
             string userInput = Console.ReadLine();
-            
-            if (userInput.ToLower() == "да")
+
+            if ( userInput.ToLower() == "да" )
             {
                 return true;
-            } 
-            else if (userInput.ToLower() == "нет")
+            }
+            else if ( userInput.ToLower() == "нет" )
             {
                 return false;
             }
         }
     }
-    
+
     private static void Run()
     {
-        Console.WriteLine("Создание нового заказа");
-        
+        Console.WriteLine( "Создание нового заказа" );
+
         OrderData order = CreateOrder();
-        
-        if (IsOrderConfimerd(order))
+
+        if ( IsOrderConfimerd( order ) )
         {
-            PrintConfirmedOrder(order);
+            PrintConfirmedOrder( order );
         }
         else
         {
-            Console.WriteLine("Заказ не принят");
-            if (AskUser("Продолжить создание заказа? Введите: Да/Нет"))
+            Console.WriteLine( "Заказ не принят" );
+            if ( AskUser( "Продолжить создание заказа? Введите: Да/Нет" ) )
             {
                 Run();
             }
