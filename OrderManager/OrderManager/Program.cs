@@ -1,15 +1,9 @@
 ﻿namespace OrderManager;
 
-struct OrderData
-{
-    public string ItemName;
-    public int ItemQuantity;
-    public string Username;
-    public string UserAddress;
-}
-
 class Program
 {
+    private const int DelayToDelivery = 3;
+    
     static void Main( string[] args )
     {
         Run();
@@ -19,7 +13,7 @@ class Program
     {
         Console.WriteLine( $"{order.Username}! " +
                            $"Ваш заказ {order.ItemName} в количестве {order.ItemQuantity} оформлен! " +
-                           $"Ожидайте доставку по адресу {order.UserAddress} к {DateTime.Now.AddDays( 3 ).Date.ToShortDateString()}" );
+                           $"Ожидайте доставку по адресу {order.UserAddress} к {DateTime.Now.AddDays( DelayToDelivery ).Date.ToShortDateString()}" );
     }
 
     private static bool IsOrderConfimerd( OrderData order )
