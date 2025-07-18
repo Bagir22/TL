@@ -1,0 +1,10 @@
+namespace Fighters.Models.Races;
+
+public class Elf : IRace
+{
+    public RaceType RaceType => RaceType.Elf;
+    public int Damage => 5;
+    public int Health => 30;
+    public int Vitality => 3;
+    public int Initiative => 5;
+}
