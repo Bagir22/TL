@@ -3,10 +3,34 @@
 class Program
 {
     private const int DelayToDelivery = 3;
-    
+
     static void Main( string[] args )
     {
-        Run();
+        Console.WriteLine( "Создание нового заказа" );
+
+        while ( true )
+        {
+            OrderData order = CreateOrder();
+
+            if ( IsOrderConfirmed( order ) )
+            {
+                PrintConfirmedOrder( order );
+
+                break;
+            }
+            else
+            {
+                Console.WriteLine( "Заказ не принят" );
+
+                bool tryAgain = AskUser( "Продолжить создание заказа?" );
+                if ( !tryAgain )
+                {
+                    Console.WriteLine( "Выход из программы" );
+
+                    break;
+                }
+            }
+        }
     }
 
     private static void PrintConfirmedOrder( OrderData order )
@@ -16,92 +40,103 @@ class Program
                            $"Ожидайте доставку по адресу {order.UserAddress} к {DateTime.Now.AddDays( DelayToDelivery ).Date.ToShortDateString()}" );
     }
 
-    private static bool IsOrderConfimerd( OrderData order )
+    private static bool IsOrderConfirmed( OrderData order )
     {
         Console.WriteLine( $"Здравствуйте, {order.Username}, " +
                            $"вы заказали {order.ItemQuantity} {order.ItemName} " +
                            $"на адрес {order.UserAddress}, все верно?" );
 
-        return AskUser( "Заказ правильный? Введите: Да/Нет" );
+        return AskUser( "Заказ правильный?" );
     }
 
     private static OrderData CreateOrder()
     {
-        OrderData order = new OrderData();
-
         Console.WriteLine( "Заполните данные для заказа:" );
 
-        order.ItemName = GetStringFromUser( "Название товара" );
-        order.ItemQuantity = GetIntFromUser( "Количество товара" );
-        order.Username = GetStringFromUser( "Имя пользователя" );
-        order.UserAddress = GetStringFromUser( "Адрес доставки" );
+        string itemName = GetStringFromUser( "Название товара" );
+        int itemQuantity = GetIntFromUser( "Количество товара" );
+        string username = GetStringFromUser( "Имя пользователя" );
+        string userAddress = GetStringFromUser( "Адрес доставки" );
 
-        return order;
+        try
+        {
+            return new OrderData( itemName, itemQuantity, username, userAddress );
+        }
+        catch ( ArgumentException ex )
+        {
+            Console.WriteLine( $"Не получилось создать заказ:\n" +
+                               $"Ошибка: {ex.Message}" );
+
+            return CreateOrder();
+        }
     }
 
     private static string GetStringFromUser( string messageToUser )
     {
-        string userInput = "";
-
-        while ( string.IsNullOrWhiteSpace( userInput ) )
-        {
-            Console.Write( $"{messageToUser}: " );
-            userInput = Console.ReadLine();
-        }
-
-        return userInput;
-    }
-
-    private static int GetIntFromUser( string messageToUser )
-    {
-        int number;
+        messageToUser += " (или введите Выход для завершения программы)";
 
         while ( true )
         {
             Console.Write( $"{messageToUser}: " );
-            string userInput = Console.ReadLine();
+            string? userInput = Console.ReadLine();
 
-            if ( int.TryParse( userInput, out number ) && number >= 0 )
+            CheckForExit( userInput );
+
+            if ( !string.IsNullOrWhiteSpace( userInput ) )
+            {
+                return userInput;
+            }
+
+            Console.WriteLine( "Ошибка: ввод не должен быть пустым. Попробуйте ещё раз" );
+        }
+    }
+
+    private static int GetIntFromUser( string messageToUser )
+    {
+        messageToUser += " (или введите Выход для завершения программы)";
+
+        while ( true )
+        {
+            Console.Write( $"{messageToUser}: " );
+            string? userInput = Console.ReadLine();
+
+            CheckForExit( userInput );
+
+            if ( int.TryParse( userInput, out int number ) && number > 0 )
             {
                 return number;
             }
+
+            Console.WriteLine( "Ошибка: введите положительное число" );
+        }
+    }
+
+    private static void CheckForExit( string? input )
+    {
+        if ( input?.ToLower() == "выход" )
+        {
+            Console.WriteLine( "Выход из программы" );
+            Environment.Exit( 0 );
         }
     }
 
     private static bool AskUser( string messageToUser )
     {
+        messageToUser += " Введите: Да/Нет или Выход для завершение программы";
         Console.WriteLine( messageToUser );
         while ( true )
         {
-            string userInput = Console.ReadLine();
+            string? userInput = Console.ReadLine();
 
-            if ( userInput.ToLower() == "да" )
+            CheckForExit( userInput );
+
+            if ( userInput?.ToLower() == "да" )
             {
                 return true;
             }
-            else if ( userInput.ToLower() == "нет" )
+            else if ( userInput?.ToLower() == "нет" )
             {
                 return false;
-            }
-        }
-    }
-
-    private static void Run()
-    {
-        Console.WriteLine( "Создание нового заказа" );
-
-        OrderData order = CreateOrder();
-
-        if ( IsOrderConfimerd( order ) )
-        {
-            PrintConfirmedOrder( order );
-        }
-        else
-        {
-            Console.WriteLine( "Заказ не принят" );
-            if ( AskUser( "Продолжить создание заказа? Введите: Да/Нет" ) )
-            {
-                Run();
             }
         }
     }
