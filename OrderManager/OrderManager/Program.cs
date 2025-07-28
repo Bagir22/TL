@@ -8,15 +8,16 @@ class Program
     {
         Console.WriteLine( "Создание нового заказа" );
 
-        while ( true )
+        bool isOrderCreated = false;
+
+        while ( !isOrderCreated )
         {
             OrderData order = CreateOrder();
 
             if ( IsOrderConfirmed( order ) )
             {
                 PrintConfirmedOrder( order );
-
-                break;
+                isOrderCreated = true;
             }
             else
             {
@@ -75,40 +76,54 @@ class Program
     {
         messageToUser += " (или введите Выход для завершения программы)";
 
-        while ( true )
+        bool isValidInput = false;
+        string? userInput;
+
+        do
         {
             Console.Write( $"{messageToUser}: " );
-            string? userInput = Console.ReadLine();
+            userInput = Console.ReadLine();
 
             CheckForExit( userInput );
 
             if ( !string.IsNullOrWhiteSpace( userInput ) )
             {
-                return userInput;
+                isValidInput = true;
             }
+            else
+            {
+                Console.WriteLine( "Ошибка: ввод не должен быть пустым. Попробуйте ещё раз" );
+            }
+        } while ( !isValidInput );
 
-            Console.WriteLine( "Ошибка: ввод не должен быть пустым. Попробуйте ещё раз" );
-        }
+        return userInput!;
     }
 
     private static int GetIntFromUser( string messageToUser )
     {
         messageToUser += " (или введите Выход для завершения программы)";
 
-        while ( true )
+        int result;
+        bool isValid = false;
+
+        do
         {
             Console.Write( $"{messageToUser}: " );
             string? userInput = Console.ReadLine();
 
             CheckForExit( userInput );
 
-            if ( int.TryParse( userInput, out int number ) && number > 0 )
+            if ( int.TryParse( userInput, out result ) && result > 0 )
             {
-                return number;
+                isValid = true;
             }
+            else
+            {
+                Console.WriteLine( "Ошибка: введите положительное число" );
+            }
+        } while ( !isValid );
 
-            Console.WriteLine( "Ошибка: введите положительное число" );
-        }
+        return result;
     }
 
     private static void CheckForExit( string? input )
@@ -123,8 +138,12 @@ class Program
     private static bool AskUser( string messageToUser )
     {
         messageToUser += " Введите: Да/Нет или Выход для завершение программы";
-        Console.WriteLine( messageToUser );
-        while ( true )
+
+        bool? result = null;
+
+        Console.WriteLine( $"{messageToUser}" );
+
+        do
         {
             string? userInput = Console.ReadLine();
 
@@ -132,12 +151,14 @@ class Program
 
             if ( userInput?.ToLower() == "да" )
             {
-                return true;
+                result = true;
             }
             else if ( userInput?.ToLower() == "нет" )
             {
-                return false;
+                result = false;
             }
-        }
+        } while ( !result.HasValue );
+
+        return result.Value;
     }
 }

@@ -13,7 +13,7 @@ public class OrderData
             throw new ArgumentException( "Название товара не может быть пустым" );
 
         if ( itemQuantity <= 0 )
-            throw new ArgumentException( $"Количество товара меньше или равно 0. Сейчас - {itemQuantity}" );
+            throw new ArgumentException( $"Количество товара должно быть больше 0" );
 
         if ( string.IsNullOrWhiteSpace( username ) )
             throw new ArgumentException( "Имя пользователя не может быть пустым" );
