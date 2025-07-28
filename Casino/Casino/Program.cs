@@ -2,9 +2,12 @@
 {
     public class Program
     {
-        static readonly Random random = new Random();
+        private static readonly Random Random = new Random();
+        private static readonly int[] WinningNumbers = [ 18, 19, 20 ];
 
-        const string gameName = @"
+        const int Multiplicator = 1;
+
+        const string GameName = @"
              ######  #####  ####### ######## ###   ##    #####  
             ##   ## ##   ## ##         ##    ## ##  ##  ##   ## 
             ##        ####   #####     ##    ##  ## ##  ##   ## 
@@ -13,44 +16,49 @@
              ######  ##   ## ####### ####### ##     ###  #####  
             ";
 
-        const int multiplicator = 1;
-
         public static void Main( string[] args )
         {
-            PrintGameName( gameName );
+            PrintGameName( GameName );
 
-            Console.Write( "Please enter amount of money: " );
-            string balanceStr = Console.ReadLine();
-            Console.WriteLine();
-
-            bool isBalanceParsed = int.TryParse( balanceStr, out int balance );
-            if ( !isBalanceParsed )
-            {
-                Console.WriteLine( $"Invalid balance value {balanceStr}" );
-                
-                return;
-            }
-
-            if ( balance <= 0 )
-            {
-                Console.WriteLine( "You are too poor for this game" );
-                
-                return;
-            }
+            Player player = InitPlayer();
 
             Operation? operation = Operation.Initial;
 
             while ( operation != Operation.Exit )
             {
                 operation = ReadOperation();
-                HandleOperation( operation, ref balance );
+                HandleOperation( operation, player );
             }
+        }
+
+        private static Player InitPlayer()
+        {
+            bool isPlayerCreated = false;
+            Player? player = null;
+
+            do
+            {
+                Console.Write( "Please enter amount of money: " );
+                string? userInput = Console.ReadLine();
+                Console.WriteLine();
+
+                if ( int.TryParse( userInput, out int balance ) && balance > 0 )
+                {
+                    player = new Player( balance );
+                    isPlayerCreated = true;
+                }
+                else
+                {
+                    Console.WriteLine( $"Invalid value: {userInput}. Please enter a positive number\n" );
+                }
+            } while ( !isPlayerCreated );
+
+            return player!;
         }
 
         private static void PrintGameName( string gameName )
         {
-            Console.WriteLine( gameName );
-            Console.WriteLine();
+            Console.WriteLine( $"{gameName}\n" );
         }
 
         private static Operation? ReadOperation()
@@ -58,78 +66,74 @@
             PrintAvailableOperations();
             Console.Write( "Please enter operation: " );
 
-            string operationStr = Console.ReadLine();
+            string? operationStr = Console.ReadLine();
 
             bool isParsed = Enum.TryParse( operationStr, out Operation operation );
 
             return isParsed ? operation : null;
         }
 
-        private static void HandleOperation( Operation? operation, ref int balance )
+        private static void HandleOperation( Operation? operation, Player player )
         {
-            switch ( operation )
+            try
             {
-                case Operation.Initial:
-                    return;
-                case Operation.Play:
-                    PlayGame( ref balance );
-                    break;
-                case Operation.CheckBalance:
-                    PrintBalanceInfo( balance );
-                    break;
-                case Operation.Exit:
-                    PrintExitInfo( balance );
-                    break;
-                default:
-                    throw new Exception( $"Unsupported operation type: {operation}" );
+                switch ( operation )
+                {
+                    case Operation.Initial:
+                        return;
+                    case Operation.Play:
+                        PlayGame( player );
+                        break;
+                    case Operation.CheckBalance:
+                        player.PrintBalanceInfo();
+                        break;
+                    case Operation.Exit:
+                        PrintExitInfo( player );
+                        break;
+                    default:
+                        throw new Exception( $"Unsupported operation type: {operation}" );
+                }
+            }
+            catch ( Exception e )
+            {
+                Console.WriteLine( e.Message );
             }
         }
 
-        private static void PrintBalanceInfo( int balance )
+        private static void PrintExitInfo( Player player )
         {
-            Console.WriteLine( $"Your balance is {balance}\n" );
+            Console.WriteLine( "You exit the game" );
+            player.PrintBalanceInfo();
         }
 
-        private static void PrintExitInfo( int balance )
+        private static void PlayGame( Player player )
         {
-            Console.WriteLine( "You exit the game\n" );
-            PrintBalanceInfo( balance );
-        }
-
-        private static void PlayGame( ref int balance )
-        {
-            if ( balance == 0 )
+            if ( player.Balance == 0 )
             {
-                Console.WriteLine( "You are too lost to play!" );
+                Console.WriteLine( "You are too lost to play(((" );
                 Environment.Exit( 0 );
             }
 
-            int bet = MakeBet( balance );
+            int bet = MakeBet( player );
 
             Console.WriteLine( $"\nStart new Game! Your bet is {bet}" );
 
-            int randomNumber = random.Next( 1, 21 );
+            int randomNumber = Random.Next( 1, 21 );
             Console.WriteLine( $"Your drawn number is {randomNumber}" );
 
-            bool isWin = new int[] { 18, 19, 20 }.Contains( randomNumber );
+            bool isWin = WinningNumbers.Contains( randomNumber );
 
-            UpdateBalance( isWin, ref balance, bet, randomNumber );
+            UpdateBalance( player, isWin, bet, randomNumber );
         }
 
-        private static int MakeBet( int balance )
+        private static int MakeBet( Player player )
         {
-            if ( balance == 0 )
-            {
-                Console.WriteLine( $"Your balance is {balance}. You can't play the game(((" );
-                return 0;
-            }
-
             int bet = 0;
-            Console.WriteLine( $"Please enter a bet, less than or equal to your balance {balance}:" );
+            Console.WriteLine( $"Please enter a bet, less than or equal to your balance {player.Balance}:" );
 
-            while ( !int.TryParse( Console.ReadLine(), out bet ) || bet <= 0 || bet > balance )
+            while ( !int.TryParse( Console.ReadLine(), out bet ) || !player.CanMakeBet( bet ) )
             {
-                Console.WriteLine( $"Invalid bet. Enter positive bet less or equal your balance {balance}:" );
+                Console.WriteLine( $"Invalid bet. Enter positive bet less or equal your balance {player.Balance}:" );
             }
 
             return bet;
@@ -143,20 +147,20 @@
             Console.WriteLine( "3 - Exit\n" );
         }
 
-        private static void UpdateBalance( bool isWin, ref int balance, int bet, int randomNumber )
+        private static void UpdateBalance( Player player, bool isWin, int bet, int randomNumber )
         {
             if ( isWin )
             {
-                balance += bet * ( multiplicator * ( randomNumber % 17 ) );
+                player.UpdateBalance( bet * ( Multiplicator * ( randomNumber % 17 ) ) );
                 Console.WriteLine( "You win the game!" );
             }
             else
             {
-                balance -= bet;
+                player.UpdateBalance( -bet );
                 Console.WriteLine( "You lose the game(((" );
             }
 
-            PrintBalanceInfo( balance );
+            player.PrintBalanceInfo();
         }
     }
 }
