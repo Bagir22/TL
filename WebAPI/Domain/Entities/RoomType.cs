@@ -10,7 +10,7 @@ public class RoomType
     public Currency Currency { get; set; }
     public int MinPersonCount { get; set; }
     public int MaxPersonCount { get; set; }
-    public string Services { get; set; }
+    public string? Services { get; set; }
     
     public string Amenities { get; set; }
     

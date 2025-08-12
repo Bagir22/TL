@@ -1,16 +1,39 @@
+using AutoMapper;
+using Domain;
+using Domain.Repositories;
+using Domain.Services;
 using Infrastructure;
+using Infrastructure.Services;
+using Infrastructure.Storage;
+using Infrastructure.Storage.Repositories;
 using Microsoft.EntityFrameworkCore;
+using WebAPI.Mapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
 
 builder.Services.AddDbContext<WebAPIDbContext>( options =>
 {
     options.UseSqlServer( builder.Configuration.GetConnectionString( "DBConnection" ) );
 } );
     
+builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
+builder.Services.AddScoped<IPropertyService, PropertyService>();
+
+builder.Services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
+builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<PropertyProfile>();
+    cfg.AddProfile<RoomTypeProfile>();
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -21,5 +44,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.MapControllers();
 
 app.Run();

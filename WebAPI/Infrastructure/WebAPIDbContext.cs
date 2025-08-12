@@ -1,3 +1,4 @@
+using Domain.Entities;
 using Infrastructure.Storage.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -6,6 +7,8 @@ namespace Infrastructure;
 
 public class WebAPIDbContext : DbContext
 {
+    public DbSet<Property> Property { get; set; }
+    public DbSet<RoomType> RoomType { get; set; }
     public WebAPIDbContext() {}
     
     public WebAPIDbContext(DbContextOptions<WebAPIDbContext> options)
