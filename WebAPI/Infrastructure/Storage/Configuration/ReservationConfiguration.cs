@@ -27,21 +27,23 @@ public class ReservationConfiguration : IEntityTypeConfiguration<Reservation>
         builder.Property( r => r.ArrivalTime ).IsRequired();
 
         builder.Property( r => r.DepartureTime ).IsRequired();
-
-        builder.Property( r => r.GuestName ).IsRequired().HasMaxLength( 100 );
-
-        builder.Property( r => r.GuestPhoneNumber ).IsRequired().HasMaxLength( 12 );
-
+        
         builder.Property( rt => rt.Total ).IsRequired().HasColumnType( "decimal(9,2)" );
 
-        builder.Property( rt => rt.Currency )
-            .IsRequired()
-            .HasConversion<int>();
+        builder.HasOne(r => r.Currency)
+            .WithMany(c => c.Reservations)
+            .HasForeignKey(r => r.CurrencyId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasMany(r => r.ReservationGuests)
+            .WithOne(rg => rg.Reservation)
+            .HasForeignKey(rg => rg.ReservationId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasCheckConstraint(
             "CK_Reservation_ArrivalBeforeDeparture",
-            "CONVERT(DATETIME2, CONVERT(VARBINARY(6), DepartureTime) + CONVERT(BINARY(3), DepartureDateUTC)) > " +
-            "CONVERT(DATETIME2, CONVERT(VARBINARY(6), ArrivalTime) + CONVERT(BINARY(3), ArrivalDateUTC))"
+              "CONVERT(DATETIME2, CONVERT(VARBINARY(6), DepartureTime) + CONVERT(BINARY(3), DepartureDateUTC)) > " +
+                  "CONVERT(DATETIME2, CONVERT(VARBINARY(6), ArrivalTime) + CONVERT(BINARY(3), ArrivalDateUTC))"
         );
     }
 }

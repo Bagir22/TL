@@ -29,7 +29,7 @@ public class RoomTypeService : IRoomTypeService
 
     public async Task<RoomType?> GetRoomTypeByIdAsync( Guid id )
     {
-        return await _roomTypeRepository.GetRoomTypeDtoByIdAsync(id);
+        return await _roomTypeRepository.GetRoomTypeByIdAsync(id);
     }
     
     public async Task<IEnumerable<RoomType>> GetAllRoomTypesAsync()
@@ -44,7 +44,7 @@ public class RoomTypeService : IRoomTypeService
 
     public async Task<RoomType?> UpdateRoomTypeAsync( Guid id, RoomType updatedRoomType )
     {
-        RoomType? roomType = await _roomTypeRepository.GetRoomTypeDtoByIdAsync( id );
+        RoomType? roomType = await _roomTypeRepository.GetRoomTypeByIdAsync( id );
         if ( roomType == null )
         {
             return null;
@@ -55,9 +55,18 @@ public class RoomTypeService : IRoomTypeService
         roomType.Currency = updatedRoomType.Currency;
         roomType.MinPersonCount = updatedRoomType.MinPersonCount;
         roomType.MaxPersonCount = updatedRoomType.MaxPersonCount;
-        roomType.Services = updatedRoomType.Services;
-        roomType.Amenities = updatedRoomType.Amenities;
         roomType.RoomsCount = updatedRoomType.RoomsCount;
+        
+        // Сделал временно что бы не ругалось при миграции
+        foreach (Domain.Entities.RoomTypeService service in updatedRoomType.RoomTypeServices)
+        {
+            roomType.RoomTypeServices.Add(service);
+        }
+        
+        foreach (Domain.Entities.RoomTypeAmenity amenity in updatedRoomType.RoomTypeAmenities)
+        {
+            roomType.RoomTypeAmenities.Add(amenity);
+        }
 
         await _roomTypeRepository.UpdateRoomTypeAsync( roomType );
         await _unitOfWork.CommitAsync();
@@ -67,7 +76,7 @@ public class RoomTypeService : IRoomTypeService
 
     public async Task<bool> DeleteRoomTypeAsync( Guid id )
     {
-        RoomType? roomType = await _roomTypeRepository.GetRoomTypeDtoByIdAsync( id );
+        RoomType? roomType = await _roomTypeRepository.GetRoomTypeByIdAsync( id );
         if ( roomType == null )
         {
             return false;

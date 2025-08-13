@@ -13,24 +13,21 @@ public class RoomTypeConfiguration : IEntityTypeConfiguration<RoomType>
         builder.HasOne( rt => rt.Property )
             .WithMany( p => p.RoomTypes )
             .HasForeignKey( rt => rt.PropertyId )
-            .OnDelete( DeleteBehavior.Cascade );
+            .OnDelete( DeleteBehavior.Restrict );
 
         builder.Property( rt => rt.Name ).IsRequired().HasMaxLength( 50 );
 
         builder.Property( rt => rt.DailyPrice ).IsRequired().HasColumnType( "decimal(9,2)" );
 
-        builder.Property( rt => rt.Currency )
-            .IsRequired()
-            .HasConversion<int>();
+        builder.HasOne(rt => rt.Currency)
+            .WithMany(c => c.RoomTypes)
+            .HasForeignKey(rt => rt.CurrencyId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property( rt => rt.MinPersonCount ).IsRequired();
 
         builder.Property( rt => rt.MaxPersonCount ).IsRequired();
-
-        builder.Property( rt => rt.Services ).HasMaxLength( 300 );
-
-        builder.Property( rt => rt.Amenities ).HasMaxLength( 300 );
-
+        
         builder.HasCheckConstraint(
             "CK_RoomType_MinPersonCount_Positive",
             "[MinPersonCount] > 0"

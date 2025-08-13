@@ -1,13 +1,16 @@
 using Domain.Entities;
 
-namespace Domain.Repositories;
+namespace Domain.Services;
 
-public interface IReservationRepository
+public interface IReservationService
 {
     Task<Reservation> CreateReservationAsync(Reservation reservation);
+    
     Task<Reservation?> GetReservationByIdAsync( Guid id );
+    
     Task<IEnumerable<Reservation>> GetAllReservationsAsync();
-    Task DeleteReservationAsync( Guid id );
+    
+    Task<bool> DeleteReservationAsync( Guid id );
     
     Task<IEnumerable<Reservation>> SearchAsync(string city, DateOnly arrivalDate, DateOnly departureDate, int guests);
 }

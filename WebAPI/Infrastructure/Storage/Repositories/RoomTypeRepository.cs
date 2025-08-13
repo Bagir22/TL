@@ -25,11 +25,11 @@ public class RoomTypeRepository : IRoomTypeRepository
         return roomType;
     }
 
-    public async Task<RoomType?> GetRoomTypeDtoByIdAsync(Guid id)
+    public async Task<RoomType?> GetRoomTypeByIdAsync( Guid id )
     {
         return await _context.RoomType.FirstOrDefaultAsync( x => x.Id == id );
     }
-
+    
     public async Task<IEnumerable<RoomType>> GetAllRoomTypesAsync()
     {
         return await _context.RoomType.ToListAsync();
@@ -55,9 +55,19 @@ public class RoomTypeRepository : IRoomTypeRepository
         entity.Currency = roomType.Currency;
         entity.MinPersonCount = roomType.MinPersonCount;
         entity.MaxPersonCount = roomType.MaxPersonCount;
-        entity.Services = roomType.Services;
-        entity.Amenities = roomType.Amenities;
         entity.RoomsCount = roomType.RoomsCount;
+        
+        
+        // Сделал временно что бы не ругалось при миграции
+        foreach (Domain.Entities.RoomTypeService service in roomType.RoomTypeServices)
+        {
+            roomType.RoomTypeServices.Add(service);
+        }
+        
+        foreach (Domain.Entities.RoomTypeAmenity amenity in roomType.RoomTypeAmenities)
+        {
+            roomType.RoomTypeAmenities.Add(amenity);
+        }
 
         _context.RoomType.Update(entity);
     }

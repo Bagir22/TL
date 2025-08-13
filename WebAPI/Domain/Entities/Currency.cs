@@ -1,8 +1,10 @@
 namespace Domain.Entities;
 
-public enum Currency
+public class Currency
 {
-    RUB = 0,
-    EUR,
-    USD
+    public int Id { get; set; }            
+    public string Type { get; set; }     
+    
+    public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+    public ICollection<RoomType> RoomTypes { get; set; } = new List<RoomType>();
 }

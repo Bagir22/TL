@@ -26,12 +26,16 @@ builder.Services.AddScoped<IPropertyService, PropertyService>();
 builder.Services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
 builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
 
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<PropertyProfile>();
     cfg.AddProfile<RoomTypeProfile>();
+    cfg.AddProfile<ReservationProfile>();
 });
 
 var app = builder.Build();
