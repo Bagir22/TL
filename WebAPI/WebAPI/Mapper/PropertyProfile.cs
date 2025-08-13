@@ -1,6 +1,7 @@
 using AutoMapper;
 using Domain.Entities;
 using WebAPI.DTOs;
+using WebAPI.DTOs.PropertyDTOs;
 
 namespace WebAPI.Mapper;
 

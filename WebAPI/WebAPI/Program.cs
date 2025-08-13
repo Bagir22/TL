@@ -6,7 +6,9 @@ using Infrastructure;
 using Infrastructure.Services;
 using Infrastructure.Storage;
 using Infrastructure.Storage.Repositories;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebAPI.Exceptions;
 using WebAPI.Mapper;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,6 +38,16 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddProfile<PropertyProfile>();
     cfg.AddProfile<RoomTypeProfile>();
     cfg.AddProfile<ReservationProfile>();
+});
+
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<HttpResponseExceptionFilter>();
+});
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
 });
 
 var app = builder.Build();

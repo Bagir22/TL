@@ -15,11 +15,6 @@ public class PropertyRepository : IPropertyRepository
 
     public async Task<Property> CreatePropertyAsync( Property property )
     {
-        if ( property.Id == Guid.Empty )
-        {
-            property.Id = Guid.NewGuid();
-        }
-
         await _context.Property.AddAsync( property );
 
         return property;
@@ -37,25 +32,13 @@ public class PropertyRepository : IPropertyRepository
 
     public async Task UpdatePropertyAsync(Property property)
     {
-        Property? entity = await _context.Property.FindAsync(property.Id);
-        if (entity == null)
-        {
-            throw new KeyNotFoundException($"Property with Id {property.Id} not found");
-        }
-
-        entity.Name = property.Name;
-        entity.Country = property.Country;
-        entity.City = property.City;
-        entity.Address = property.Address;
-        entity.Latitude = property.Latitude;
-        entity.Longitude = property.Longitude;
-
-        _context.Property.Update(entity);
+        _context.Property.Update(property);
     }
 
     public async Task DeletePropertyAsync( Guid id )
     {
         Property? property = await _context.Property.FirstOrDefaultAsync( p => p.Id == id );
+        
         if ( property != null )
         {
             _context.Property.Remove( property );

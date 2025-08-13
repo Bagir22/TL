@@ -3,6 +3,7 @@ using Domain.Entities;
 using Domain.Services;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.DTOs;
+using WebAPI.DTOs.PropertyDTOs;
 
 namespace WebAPI.Controllers;
 
