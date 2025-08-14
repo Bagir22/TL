@@ -24,9 +24,11 @@ namespace Infrastructure.Storage.Migrations
 
             modelBuilder.Entity("Domain.Entities.Amenity", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -111,7 +113,12 @@ namespace Infrastructure.Storage.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Property");
+                    b.ToTable("Property", t =>
+                        {
+                            t.HasCheckConstraint("CK_Property_Latitude", "[Latitude] >= -90 AND [Latitude] <= 90");
+
+                            t.HasCheckConstraint("CK_Property_Longitude", "[Longitude] >= -180 AND [Longitude] <= 180");
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Reservation", b =>
@@ -213,6 +220,8 @@ namespace Infrastructure.Storage.Migrations
                             t.HasCheckConstraint("CK_RoomType_MaxPersonCount_MoreOrEqualMinPersonCount", "[MaxPersonCount] >= [MinPersonCount]");
 
                             t.HasCheckConstraint("CK_RoomType_MinPersonCount_Positive", "[MinPersonCount] > 0");
+
+                            t.HasCheckConstraint("CK_RoomType_RoomsCount_Positive", "[RoomsCount] > 0");
                         });
                 });
 
@@ -221,8 +230,8 @@ namespace Infrastructure.Storage.Migrations
                     b.Property<Guid>("RoomTypeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AmenityId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("AmenityId")
+                        .HasColumnType("int");
 
                     b.HasKey("RoomTypeId", "AmenityId");
 
@@ -236,8 +245,8 @@ namespace Infrastructure.Storage.Migrations
                     b.Property<Guid>("RoomTypeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ServiceId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
 
                     b.HasKey("RoomTypeId", "ServiceId");
 
@@ -248,9 +257,11 @@ namespace Infrastructure.Storage.Migrations
 
             modelBuilder.Entity("Domain.Entities.Service", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -294,13 +305,13 @@ namespace Infrastructure.Storage.Migrations
                     b.HasOne("Domain.Entities.Guest", "Guest")
                         .WithMany("ReservationGuests")
                         .HasForeignKey("GuestId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Reservation", "Reservation")
                         .WithMany("ReservationGuests")
                         .HasForeignKey("ReservationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Guest");

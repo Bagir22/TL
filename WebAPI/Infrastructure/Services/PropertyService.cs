@@ -16,7 +16,7 @@ public class PropertyService : IPropertyService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Property> CreatePropertyAsync( Property property )
+    public async Task<Property?> CreatePropertyAsync( Property property )
     {
         await _propertyRepository.CreatePropertyAsync( property );
         await _unitOfWork.CommitAsync();
@@ -42,14 +42,12 @@ public class PropertyService : IPropertyService
             return null;
         }
 
-        property.Update(
-            updatedProperty.Name,
-            updatedProperty.Country,
-            updatedProperty.City,
-            updatedProperty.Address,
-            updatedProperty.Latitude,
-            updatedProperty.Longitude
-        );
+        property.Name = updatedProperty.Name;
+        property.Country = updatedProperty.Country;
+        property.City = updatedProperty.City;
+        property.Address = updatedProperty.Address;
+        property.Latitude = updatedProperty.Latitude;
+        property.Longitude = updatedProperty.Longitude;
 
         await _propertyRepository.UpdatePropertyAsync(property);
         await _unitOfWork.CommitAsync();

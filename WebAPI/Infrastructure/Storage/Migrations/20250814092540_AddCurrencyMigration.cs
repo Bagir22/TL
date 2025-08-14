@@ -5,7 +5,7 @@
 namespace Infrastructure.Storage.Migrations
 {
     /// <inheritdoc />
-    public partial class AddCurrenciesMigration : Migration
+    public partial class AddCurrencyMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

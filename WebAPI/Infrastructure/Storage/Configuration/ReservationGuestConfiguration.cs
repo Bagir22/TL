@@ -13,11 +13,11 @@ public class ReservationGuestConfiguration : IEntityTypeConfiguration<Reservatio
         builder.HasOne(rg => rg.Reservation)
             .WithMany(r => r.ReservationGuests)
             .HasForeignKey(rg => rg.ReservationId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(rg => rg.Guest)
             .WithMany(g => g.ReservationGuests)
             .HasForeignKey(rg => rg.GuestId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -8,19 +8,90 @@ namespace Infrastructure.Services;
 public class RoomTypeService : IRoomTypeService
 {
     private readonly IRoomTypeRepository _roomTypeRepository;
+    private readonly IPropertyRepository _propertyRepository;
+    private readonly ICurrencyRepository _currencyRepository;
+    private readonly IServiceRepository _serviceRepository;
+    private readonly IAmenityRepository _amenityRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public RoomTypeService( IRoomTypeRepository roomTypeRepository, IUnitOfWork unitOfWork )
+    public RoomTypeService(
+        IRoomTypeRepository roomTypeRepository,
+        IPropertyRepository propertyRepository,
+        ICurrencyRepository currencyRepository,
+        IServiceRepository serviceRepository,
+        IAmenityRepository amenityRepository,
+        IUnitOfWork unitOfWork
+    )
     {
         _roomTypeRepository = roomTypeRepository;
+        _propertyRepository = propertyRepository;
+        _currencyRepository = currencyRepository;
+        _serviceRepository = serviceRepository;
+        _amenityRepository = amenityRepository;
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<RoomType> CreateRoomTypeAsync( Guid propertyId, RoomType roomType )
+    public async Task<RoomType?> CreateRoomTypeAsync(
+        Guid propertyId,
+        RoomType roomType,
+        string currencyCode,
+        List<string> services,
+        List<string> amenities
+    )
     {
+        Property? property = await _propertyRepository.GetPropertyByIdAsync( propertyId );
+        if ( property == null )
+        {
+            return null;
+        }
+
+        Currency? currency = await _currencyRepository.GetCurrencyByTypeAsync( currencyCode );
+        if ( currency == null )
+        {
+            return null;
+        }
+
+        roomType.CurrencyId = currency.Id;
+
+        foreach ( string serviceName in services.Distinct() )
+        {
+            Service? service = await _serviceRepository.GetServiceByNameAsync( serviceName );
+            if ( service == null )
+            {
+                service = new Service
+                {
+                    Name = serviceName
+                };
+                await _serviceRepository.CreateServiceAsync( service );
+            }
+
+            roomType.RoomTypeServices.Add( new Domain.Entities.RoomTypeService
+            {
+                Service = service
+            } );
+        }
+
+        foreach ( string amenityName in amenities.Distinct() )
+        {
+            Amenity? amenity = await _amenityRepository.GetAmenityByNameAsync( amenityName );
+            if ( amenity == null )
+            {
+                amenity = new Amenity
+                {
+                    Name = amenityName
+                };
+                await _amenityRepository.CreateAmenityAsync( amenity );
+            }
+
+            roomType.RoomTypeAmenities.Add( new RoomTypeAmenity
+            {
+                Amenity = amenity
+            } );
+        }
+
         roomType.Id = Guid.NewGuid();
         roomType.PropertyId = propertyId;
-        
+
         await _roomTypeRepository.CreateRoomTypeAsync( roomType );
         await _unitOfWork.CommitAsync();
 
@@ -29,50 +100,47 @@ public class RoomTypeService : IRoomTypeService
 
     public async Task<RoomType?> GetRoomTypeByIdAsync( Guid id )
     {
-        return await _roomTypeRepository.GetRoomTypeByIdAsync(id);
+        return await _roomTypeRepository.GetRoomTypeByIdAsync( id );
     }
-    
-    public async Task<IEnumerable<RoomType>> GetAllRoomTypesAsync()
+
+    public async Task<IEnumerable<RoomType?>> GetAllRoomTypesAsync()
     {
         return await _roomTypeRepository.GetAllRoomTypesAsync();
     }
 
-    public async Task<IEnumerable<RoomType>> GetRoomTypesByPropertyIdAsync( Guid propertyId )
+    public async Task<IEnumerable<RoomType?>> GetRoomTypesByPropertyIdAsync( Guid propertyId )
     {
         return await _roomTypeRepository.GetRoomTypesByPropertyIdAsync( propertyId );
     }
 
-    public async Task<RoomType?> UpdateRoomTypeAsync( Guid id, RoomType updatedRoomType )
+    public async Task<RoomType?> UpdateRoomTypeAsync(
+        RoomType updatedRoomType,
+        string currencyCode,
+        List<string> services,
+        List<string> amenities
+    )
     {
-        RoomType? roomType = await _roomTypeRepository.GetRoomTypeByIdAsync( id );
-        if ( roomType == null )
-        {
+        RoomType? roomType = await _roomTypeRepository.GetRoomTypeByIdAsync(updatedRoomType.Id);
+        if (roomType == null)
             return null;
-        }
-
-        roomType.Name = updatedRoomType.Name;
-        roomType.DailyPrice = updatedRoomType.DailyPrice;
-        roomType.Currency = updatedRoomType.Currency;
-        roomType.MinPersonCount = updatedRoomType.MinPersonCount;
-        roomType.MaxPersonCount = updatedRoomType.MaxPersonCount;
-        roomType.RoomsCount = updatedRoomType.RoomsCount;
         
-        // Сделал временно что бы не ругалось при миграции
-        foreach (Domain.Entities.RoomTypeService service in updatedRoomType.RoomTypeServices)
-        {
-            roomType.RoomTypeServices.Add(service);
-        }
+        Currency? currency = await _currencyRepository.GetCurrencyByTypeAsync(currencyCode);
+        if (currency == null)
+            return null;
         
-        foreach (Domain.Entities.RoomTypeAmenity amenity in updatedRoomType.RoomTypeAmenities)
-        {
-            roomType.RoomTypeAmenities.Add(amenity);
-        }
-
-        await _roomTypeRepository.UpdateRoomTypeAsync( roomType );
+        updatedRoomType.CurrencyId = currency.Id;
+        
+        await _roomTypeRepository.UpdateRoomTypeAsync(
+            updatedRoomType,
+            services,
+            amenities
+        );
+        
         await _unitOfWork.CommitAsync();
-
-        return roomType;
+        
+        return await _roomTypeRepository.GetRoomTypeByIdAsync(updatedRoomType.Id);
     }
+
 
     public async Task<bool> DeleteRoomTypeAsync( Guid id )
     {

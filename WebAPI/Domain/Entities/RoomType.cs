@@ -18,6 +18,5 @@ public class RoomType
 
     public ICollection<RoomTypeService> RoomTypeServices { get; set; } = new List<RoomTypeService>();
     public ICollection<RoomTypeAmenity> RoomTypeAmenities { get; set; } = new List<RoomTypeAmenity>();
-
     public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 }

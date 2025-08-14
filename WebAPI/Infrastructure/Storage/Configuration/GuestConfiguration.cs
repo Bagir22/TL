@@ -14,7 +14,7 @@ public class GuestConfiguration : IEntityTypeConfiguration<Guest>
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(g => g.PhoneNumber)
+        builder.Property(g => g.PhoneNumber) // add unique
             .IsRequired()
             .HasMaxLength(12);
         

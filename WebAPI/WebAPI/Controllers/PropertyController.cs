@@ -33,12 +33,7 @@ public class PropertyController : ControllerBase
 
             throw new HttpResponseException(400, string.Join("; ", errors));
         }
-
-        if (dto == null)
-        {
-            throw new HttpResponseException(400, "DTO cannot be null");
-        }
-
+        
         Property? property = _mapper.Map<Property>(dto);
 
         try
@@ -85,11 +80,6 @@ public class PropertyController : ControllerBase
                 .SelectMany(me => me.Errors)
                 .Select(e => e.ErrorMessage);
             throw new HttpResponseException(400, string.Join("; ", errors));
-        }
-
-        if (dto == null)
-        {
-            throw new HttpResponseException(400, "DTO cannot be null");
         }
 
         Property updatedProperty = _mapper.Map<Property>(dto);

@@ -27,49 +27,96 @@ public class RoomTypeRepository : IRoomTypeRepository
 
     public async Task<RoomType?> GetRoomTypeByIdAsync( Guid id )
     {
-        return await _context.RoomType.FirstOrDefaultAsync( x => x.Id == id );
+        return await _context.RoomType
+            .Include(rt => rt.Currency)
+            .Include(rt => rt.RoomTypeServices)
+            .ThenInclude(rts => rts.Service)
+            .Include(rt => rt.RoomTypeAmenities)
+            .ThenInclude(rta => rta.Amenity)
+            .FirstOrDefaultAsync(rt => rt.Id == id);
     }
     
-    public async Task<IEnumerable<RoomType>> GetAllRoomTypesAsync()
-    {
-        return await _context.RoomType.ToListAsync();
-    }
-
-    public async Task<IEnumerable<RoomType>> GetRoomTypesByPropertyIdAsync( Guid propertyId )
+    public async Task<IEnumerable<RoomType?>> GetAllRoomTypesAsync()
     {
         return await _context.RoomType
-            .Where( rt => rt.PropertyId == propertyId )
+            .Include(rt => rt.Currency)
+            .Include(rt => rt.RoomTypeServices)
+            .ThenInclude(rts => rts.Service)
+            .Include(rt => rt.RoomTypeAmenities)
+            .ThenInclude(rta => rta.Amenity)
             .ToListAsync();
     }
 
-    public async Task UpdateRoomTypeAsync( RoomType roomType )
+    public async Task<IEnumerable<RoomType?>> GetRoomTypesByPropertyIdAsync( Guid propertyId )
     {
-        RoomType? entity = await _context.RoomType.FindAsync(roomType.Id);
-        if ( entity == null )
-        {
-            throw new KeyNotFoundException($"RoomType with Id {roomType.Id} not found");
-        }
-        
+        return await _context.RoomType
+            .Where(rt => rt.PropertyId == propertyId)
+            .Include(rt => rt.Currency)
+            .Include(rt => rt.RoomTypeServices)
+            .ThenInclude(rts => rts.Service)
+            .Include(rt => rt.RoomTypeAmenities)
+            .ThenInclude(rta => rta.Amenity)
+            .ToListAsync();
+    }
+
+    public async Task UpdateRoomTypeAsync(RoomType roomType, IEnumerable<string> serviceNames, IEnumerable<string> amenityNames)
+    {
+        RoomType? entity = await _context.RoomType
+            .Include(rt => rt.RoomTypeServices)
+            .ThenInclude(rts => rts.Service)
+            .Include(rt => rt.RoomTypeAmenities)
+            .ThenInclude(rta => rta.Amenity)
+            .FirstOrDefaultAsync(rt => rt.Id == roomType.Id);
+
+        if (entity == null)
+            throw new InvalidOperationException("RoomType not found");
+
         entity.Name = roomType.Name;
         entity.DailyPrice = roomType.DailyPrice;
-        entity.Currency = roomType.Currency;
         entity.MinPersonCount = roomType.MinPersonCount;
         entity.MaxPersonCount = roomType.MaxPersonCount;
         entity.RoomsCount = roomType.RoomsCount;
+        entity.CurrencyId = roomType.CurrencyId;
         
-        
-        // Сделал временно что бы не ругалось при миграции
-        foreach (Domain.Entities.RoomTypeService service in roomType.RoomTypeServices)
+        entity.RoomTypeServices.Clear();
+        foreach (string serviceName in serviceNames.Distinct())
         {
-            roomType.RoomTypeServices.Add(service);
+            Service? service = await _context.Service.FirstOrDefaultAsync(s => s.Name == serviceName);
+            if (service == null)
+            {
+                service = new Service { Name = serviceName };
+                _context.Service.Add(service);
+                await _context.SaveChangesAsync();
+            }
+
+            _context.Attach(service);
+            entity.RoomTypeServices.Add(new RoomTypeService
+            {
+                RoomTypeId = entity.Id,
+                ServiceId = service.Id
+            });
         }
         
-        foreach (Domain.Entities.RoomTypeAmenity amenity in roomType.RoomTypeAmenities)
+        entity.RoomTypeAmenities.Clear();
+        foreach (string amenityName in amenityNames.Distinct())
         {
-            roomType.RoomTypeAmenities.Add(amenity);
+            Amenity? amenity = await _context.Amenity.FirstOrDefaultAsync(a => a.Name == amenityName);
+            if (amenity == null)
+            {
+                amenity = new Amenity { Name = amenityName };
+                _context.Amenity.Add(amenity);
+                await _context.SaveChangesAsync();
+            }
+
+            _context.Attach(amenity);
+            entity.RoomTypeAmenities.Add(new RoomTypeAmenity
+            {
+                RoomTypeId = entity.Id,
+                AmenityId = amenity.Id
+            });
         }
 
-        _context.RoomType.Update(entity);
+        await _context.SaveChangesAsync();
     }
     
     public async Task DeleteRoomTypeAsync( Guid id )

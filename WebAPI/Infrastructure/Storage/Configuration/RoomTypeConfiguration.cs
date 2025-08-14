@@ -28,6 +28,8 @@ public class RoomTypeConfiguration : IEntityTypeConfiguration<RoomType>
 
         builder.Property( rt => rt.MaxPersonCount ).IsRequired();
         
+        builder.Property(rt => rt.RoomsCount).IsRequired();
+        
         builder.HasCheckConstraint(
             "CK_RoomType_MinPersonCount_Positive",
             "[MinPersonCount] > 0"
@@ -36,6 +38,10 @@ public class RoomTypeConfiguration : IEntityTypeConfiguration<RoomType>
         builder.HasCheckConstraint(
             "CK_RoomType_MaxPersonCount_MoreOrEqualMinPersonCount",
             "[MaxPersonCount] >= [MinPersonCount]"
+        );
+        builder.HasCheckConstraint(
+            "CK_RoomType_RoomsCount_Positive",
+            "[RoomsCount] > 0"
         );
     }
 }
