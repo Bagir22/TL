@@ -1,4 +1,5 @@
 using Domain.Entities;
+using WebAPI.DTOs.GuestDTOs;
 
 namespace WebAPI.DTOs;
 
@@ -11,8 +12,7 @@ public class CreatedReservationDTO
         public string DepartueDateUTC { get; set; }
         public string ArrivalUTC { get; set; }
         public string DepartureUTC { get; set; }
-        public string GuestName { get; set; }
-        public string GuestPhoneNumber { get; set; }
+        public List<GuestDTO> Guests { get; set; } = new();
         public decimal Total { get; set; }
-        public Currency Currency { get; set; }
+        public string Currency { get; set; }
 }

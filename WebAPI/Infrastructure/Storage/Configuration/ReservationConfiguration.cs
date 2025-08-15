@@ -38,7 +38,7 @@ public class ReservationConfiguration : IEntityTypeConfiguration<Reservation>
         builder.HasMany(r => r.ReservationGuests)
             .WithOne(rg => rg.Reservation)
             .HasForeignKey(rg => rg.ReservationId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasCheckConstraint(
             "CK_Reservation_ArrivalBeforeDeparture",

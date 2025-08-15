@@ -8,7 +8,7 @@ namespace Infrastructure;
 public class WebAPIDbContext : DbContext
 {
     public DbSet<Property> Property { get; set; }
-    public DbSet<RoomType?> RoomType { get; set; }
+    public DbSet<RoomType> RoomType { get; set; }
     public DbSet<Reservation> Reservation { get; set; }
     public DbSet<Guest> Guest { get; set; }
     public DbSet<ReservationGuest> ReservationGuest { get; set; }

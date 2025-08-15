@@ -14,9 +14,12 @@ public class GuestConfiguration : IEntityTypeConfiguration<Guest>
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(g => g.PhoneNumber) // add unique
+        builder.Property(g => g.PhoneNumber)
             .IsRequired()
             .HasMaxLength(12);
+        
+        builder.HasIndex(g => g.PhoneNumber)
+            .IsUnique();
         
         builder.HasMany(g => g.ReservationGuests)
             .WithOne(rg => rg.Guest)

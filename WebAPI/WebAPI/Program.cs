@@ -34,11 +34,13 @@ builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IAmenityRepository, AmenityRepository>();
+builder.Services.AddScoped<IGuestRepository, GuestRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddAutoMapper(cfg =>
 {
+    cfg.AddProfile<GuestProfile>();
     cfg.AddProfile<PropertyProfile>();
     cfg.AddProfile<RoomTypeProfile>();
     cfg.AddProfile<ReservationProfile>();
