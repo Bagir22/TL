@@ -30,15 +30,15 @@ public class PropertyRepository : IPropertyRepository
         return await _context.Property.ToListAsync();
     }
 
-    public async Task UpdatePropertyAsync(Property property)
+    public async Task UpdatePropertyAsync( Property property )
     {
-        _context.Property.Update(property);
+        _context.Property.Update( property );
     }
 
     public async Task DeletePropertyAsync( Guid id )
     {
         Property? property = await _context.Property.FirstOrDefaultAsync( p => p.Id == id );
-        
+
         if ( property != null )
         {
             _context.Property.Remove( property );

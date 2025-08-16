@@ -21,9 +21,9 @@ public class PropertyConfiguration : IEntityTypeConfiguration<Property>
         builder.Property( p => p.Latitude ).IsRequired().HasColumnType( "decimal(12,10)" );
 
         builder.Property( p => p.Longitude ).IsRequired().HasColumnType( "decimal(12,10)" );
-        
-        
-        builder.HasCheckConstraint("CK_Property_Latitude", "[Latitude] >= -90 AND [Latitude] <= 90");
-        builder.HasCheckConstraint("CK_Property_Longitude", "[Longitude] >= -180 AND [Longitude] <= 180");
+
+
+        builder.HasCheckConstraint( "CK_Property_Latitude", "[Latitude] >= -90 AND [Latitude] <= 90" );
+        builder.HasCheckConstraint( "CK_Property_Longitude", "[Longitude] >= -180 AND [Longitude] <= 180" );
     }
 }

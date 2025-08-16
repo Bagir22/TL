@@ -8,21 +8,20 @@ public class GuestRepository : IGuestRepository
 {
     private readonly WebAPIDbContext _context;
 
-    public GuestRepository(WebAPIDbContext context)
+    public GuestRepository( WebAPIDbContext context )
     {
         _context = context;
     }
 
-    public async Task<Guest> CreateAsync(Guest guest)
+    public async Task<Guest> CreateAsync( Guest guest )
     {
-        _context.Guest.Add(guest);
-        await _context.SaveChangesAsync();
-        
+        _context.Guest.Add( guest );
+
         return guest;
     }
 
-    public async Task<Guest?> GetByPhoneNumberAsync(string phoneNumber)
+    public async Task<Guest?> GetByPhoneNumberAsync( string phoneNumber )
     {
-        return await _context.Guest.FirstOrDefaultAsync(g => g.PhoneNumber == phoneNumber);
+        return await _context.Guest.FirstOrDefaultAsync( g => g.PhoneNumber == phoneNumber );
     }
 }

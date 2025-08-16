@@ -4,14 +4,11 @@ public class RoomType
 {
     public Guid Id { get; set; }
     public Guid PropertyId { get; set; }
-    public Property Property { get; set; } 
-
-    public string Name { get; set; }
+    public Property Property { get; set; }
+    public required string Name { get; set; }
     public decimal DailyPrice { get; set; }
-
     public int CurrencyId { get; set; }
     public Currency Currency { get; set; }
-
     public int MinPersonCount { get; set; }
     public int MaxPersonCount { get; set; }
     public int RoomsCount { get; set; }

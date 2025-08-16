@@ -21,10 +21,10 @@ public class ReadPropertyDto
     public required string Address { get; set; }
     
     [Required]
-    [Range(-90, 90)]
+    [Range(-89.99, 89.99)]
     public decimal Latitude { get; set; }
     
     [Required]
-    [Range(-180, 180)]
+    [Range(-179.99, 179.99)]
     public decimal Longitude { get; set; }
 }

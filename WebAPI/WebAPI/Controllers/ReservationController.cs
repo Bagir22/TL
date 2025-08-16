@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Services;
@@ -6,114 +5,103 @@ using Microsoft.AspNetCore.Mvc;
 using WebAPI.DTOs;
 using WebAPI.DTOs.RoomTypeDTOs;
 using WebAPI.Exceptions;
+using ValidationException = System.ComponentModel.DataAnnotations.ValidationException;
 
 namespace WebAPI.Controllers;
 
 [ApiController]
-[Route("api")]
+[Route( "api" )]
 public class ReservationController : Controller
 {
     private readonly IReservationService _reservationService;
     private readonly IMapper _mapper;
-    
+
     public ReservationController( IReservationService reservationService, IMapper mapper )
     {
         _reservationService = reservationService;
         _mapper = mapper;
     }
-    
-    [HttpGet("search")]
-    public async Task<IActionResult> Search([FromQuery] SearchReservationsDTO query)
+
+    [HttpGet( "search" )]
+    public async Task<IActionResult> Search( [FromQuery] SearchReservationsDTO query )
     {
-        if (!ModelState.IsValid)
+        if ( !ModelState.IsValid )
         {
-            throw new HttpResponseException(400, ModelState.ToString() );
+            throw new ValidationException( ModelState.ToString() );
         }
 
-        if (!DateOnly.TryParse(query.ArrivalDate, out DateOnly arrival))
-        {
-            throw new HttpResponseException( 400, "Invalid arrivalDate format, expected yyyy-MM-dd" );
-        }
+        IEnumerable<(RoomType RoomType, int AvailableRooms)> results =
+            await _reservationService.SearchAvailableAsync( query.City, query.ArrivalDate, query.DepartureDate,
+                query.Guests );
 
-        if (!DateOnly.TryParse(query.DepartureDate, out DateOnly departure))
+        IEnumerable<AvailableRoomTypeDTO> dtos = results.Select( x =>
         {
-            throw new HttpResponseException(400, "Invalid departureDate format, expected yyyy-MM-dd" );
-        }
-
-        IEnumerable<(RoomType RoomType, int AvailableRooms)> results = await _reservationService.SearchAvailableAsync(query.City, arrival, departure, query.Guests);
-
-        IEnumerable<AvailableRoomTypeDTO> dtos = results.Select(x =>
-        {
-            AvailableRoomTypeDTO? dto = _mapper.Map<AvailableRoomTypeDTO>(x.RoomType);
+            AvailableRoomTypeDTO? dto = _mapper.Map<AvailableRoomTypeDTO>( x.RoomType );
             dto.AvailableRoomsCount = x.AvailableRooms;
-            
+
             return dto;
-        });
-        
+        } );
+
         return Ok( dtos );
     }
-    
-    [HttpPost("reservations")]
-    public async Task<IActionResult> CreateReservation([FromBody] ReadReservationDTO dto)
+
+    [HttpPost( "reservations" )]
+    public async Task<IActionResult> CreateReservation( [FromBody] ReadReservationDTO dto )
     {
-        if (!ModelState.IsValid)
+        if ( !ModelState.IsValid )
         {
-            IEnumerable<string> errors = ModelState.Values.SelectMany(v => v.Errors)
-                .Select(e => e.ErrorMessage);
-            throw new HttpResponseException(400, string.Join("; ", errors));
+            IEnumerable<string> errors = ModelState.Values.SelectMany( v => v.Errors )
+                .Select( e => e.ErrorMessage );
+
+            throw new ValidationException( string.Join( "; ", errors ) );
         }
-        
-        Reservation reservation = _mapper.Map<Reservation>(dto);
-        
-        List<Guest> guests = _mapper.Map<List<Guest>>(dto.Guests);
-        
-        try
+
+        Reservation reservation = _mapper.Map<Reservation>( dto );
+
+        List<Guest> guests = _mapper.Map<List<Guest>>( dto.Guests );
+
+        Reservation? createdReservation = await _reservationService.CreateReservationAsync(
+            reservation,
+            guests
+        );
+
+        CreatedReservationDTO responseDto = _mapper.Map<CreatedReservationDTO>( createdReservation );
+
+        return Ok( responseDto );
+    }
+
+    [HttpGet( "reservations/{id:guid}" )]
+    public async Task<ActionResult<CreatedReservationDTO>> GetReservationById( Guid id )
+    {
+        Reservation? reservation = await _reservationService.GetReservationByIdAsync( id );
+        if ( reservation == null )
         {
-            Reservation? createdReservation = await _reservationService.CreateReservationAsync(
-                reservation,
-                guests
-            );
-            
-            CreatedReservationDTO responseDto = _mapper.Map<CreatedReservationDTO>(createdReservation);
-
-            return Ok(responseDto);
+            throw new NotFoundException( $"Reservation with {id} not found" );
         }
-        catch (ValidationException ex)
-        {
-            throw new HttpResponseException(400, ex.Message);
-        }
-    }
-    
-    [HttpGet("reservations/{id:guid}")]
-    public async Task<ActionResult<CreatedReservationDTO>> GetReservationById(Guid id)
-    {
-        Reservation? reservation = await _reservationService.GetReservationByIdAsync(id);
-        if (reservation == null)
-            return NotFound();
 
-        CreatedReservationDTO? reservationDto = _mapper.Map<CreatedReservationDTO>(reservation);
-        
-        return Ok(reservationDto);
-    }
-    
-    [HttpGet("reservations/")]
-    public async Task<IActionResult> GetAllReservations([FromQuery] ReservationSearchFilterDTO dtoFilter)
-    {
-        ReservationFilter? filter = _mapper.Map<ReservationFilter>(dtoFilter);
+        CreatedReservationDTO? reservationDto = _mapper.Map<CreatedReservationDTO>( reservation );
 
-        IEnumerable<Reservation> reservations = await _reservationService.GetAllReservationsAsync(filter);
-        IEnumerable<CreatedReservationDTO>? dtos = _mapper.Map<IEnumerable<CreatedReservationDTO>>(reservations);
-
-        return Ok(dtos);
+        return Ok( reservationDto );
     }
-    
-    [HttpDelete("reservations/{id:guid}")]
-    public async Task<IActionResult> DeleteReservation(Guid id)
+
+    [HttpGet( "reservations/" )]
+    public async Task<IActionResult> GetAllReservations( [FromQuery] ReservationSearchFilterDTO dtoFilter )
     {
-        bool deleted = await _reservationService.DeleteReservationAsync(id);
+        ReservationFilter? filter = _mapper.Map<ReservationFilter>( dtoFilter );
+
+        IEnumerable<Reservation> reservations = await _reservationService.GetAllReservationsAsync( filter );
+        IEnumerable<CreatedReservationDTO>? dtos = _mapper.Map<IEnumerable<CreatedReservationDTO>>( reservations );
+
+        return Ok( dtos );
+    }
+
+    [HttpDelete( "reservations/{id:guid}" )]
+    public async Task<IActionResult> DeleteReservation( Guid id )
+    {
+        bool deleted = await _reservationService.DeleteReservationAsync( id );
         if ( !deleted )
         {
-            return NotFound();
+            throw new NotFoundException( $"Reservation with {id} not found" );
         }
 
         return Ok();

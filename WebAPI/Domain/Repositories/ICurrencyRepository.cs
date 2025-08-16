@@ -4,5 +4,5 @@ namespace Domain.Services;
 
 public interface ICurrencyRepository
 {
-    Task<Currency?> GetCurrencyByTypeAsync(string type);
+    Task<Currency?> GetCurrencyByTypeAsync( string type );
 }

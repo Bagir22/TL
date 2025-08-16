@@ -1,4 +1,3 @@
-using AutoMapper;
 using Domain;
 using Domain.Repositories;
 using Domain.Services;
@@ -11,17 +10,20 @@ using Microsoft.EntityFrameworkCore;
 using WebAPI.Exceptions;
 using WebAPI.Mapper;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder( args );
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
+builder.Services.AddControllers( options =>
+{
+    options.Filters.Add( new GlobalExceptionFilter() );
+} );
 
 builder.Services.AddDbContext<WebAPIDbContext>( options =>
 {
     options.UseSqlServer( builder.Configuration.GetConnectionString( "DBConnection" ) );
 } );
-    
+
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 builder.Services.AddScoped<IPropertyService, PropertyService>();
 
@@ -31,34 +33,33 @@ builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 
-builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IServiceService, ServiceService>();
+
 builder.Services.AddScoped<IAmenityRepository, AmenityRepository>();
+builder.Services.AddScoped<IAmenityService, AmenityService>();
+
+builder.Services.AddScoped<ICurrencyRepository, CurrencyRepository>();
 builder.Services.AddScoped<IGuestRepository, GuestRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-builder.Services.AddAutoMapper(cfg =>
+builder.Services.AddAutoMapper( cfg =>
 {
     cfg.AddProfile<GuestProfile>();
     cfg.AddProfile<PropertyProfile>();
     cfg.AddProfile<RoomTypeProfile>();
     cfg.AddProfile<ReservationProfile>();
-});
+} );
 
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add<HttpResponseExceptionFilter>();
-});
-
-builder.Services.Configure<ApiBehaviorOptions>(options =>
+builder.Services.Configure<ApiBehaviorOptions>( options =>
 {
     options.SuppressModelStateInvalidFilter = true;
-});
+} );
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if ( app.Environment.IsDevelopment() )
 {
     app.UseSwagger();
     app.UseSwaggerUI();

@@ -10,9 +10,9 @@ public class GuestProfile : Profile
     {
         CreateMap<GuestDTO, Guest>();
         CreateMap<Guest, GuestDTO>();
-        
+
         CreateMap<ReservationGuest, GuestDTO>()
-            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Guest.Name))
-            .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.Guest.PhoneNumber));
+            .ForMember( dest => dest.Name, opt => opt.MapFrom( src => src.Guest.Name ) )
+            .ForMember( dest => dest.PhoneNumber, opt => opt.MapFrom( src => src.Guest.PhoneNumber ) );
     }
 }

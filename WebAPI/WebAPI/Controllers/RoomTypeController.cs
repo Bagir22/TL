@@ -1,10 +1,9 @@
-using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Services;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.DTOs.RoomTypeDTOs;
-using WebAPI.Exceptions;
+using ValidationException = System.ComponentModel.DataAnnotations.ValidationException;
 
 namespace WebAPI.Controllers;
 
@@ -27,8 +26,8 @@ public class RoomTypeController : ControllerBase
         if ( !ModelState.IsValid )
         {
             IEnumerable<string> errors = ModelState.Values.SelectMany( v => v.Errors ).Select( e => e.ErrorMessage );
-            
-            throw new HttpResponseException( 400, string.Join( "; ", errors ) );
+
+            throw new ValidationException( string.Join( "; ", errors ) );
         }
 
         RoomType roomType = new()
@@ -39,19 +38,12 @@ public class RoomTypeController : ControllerBase
             MaxPersonCount = dto.MaxPersonCount,
             RoomsCount = dto.RoomsCount
         };
-        
-        try
-        {
-            RoomType? createdRoomType = await _roomTypeService.CreateRoomTypeAsync( propertyId, roomType,
-                dto.CurrencyType, dto.Services, dto.Amenities );
-            CreatedRoomTypeDto? createdRoomTypeDto = _mapper.Map<CreatedRoomTypeDto>( createdRoomType );
-            
-            return Ok( createdRoomTypeDto );
-        }
-        catch ( ValidationException ex )
-        {
-            throw new HttpResponseException( 400, ex.Message );
-        }
+
+        RoomType? createdRoomType = await _roomTypeService.CreateRoomTypeAsync( propertyId, roomType,
+            dto.CurrencyType, dto.Services, dto.Amenities );
+        CreatedRoomTypeDto? createdRoomTypeDto = _mapper.Map<CreatedRoomTypeDto>( createdRoomType );
+
+        return Ok( createdRoomTypeDto );
     }
 
     [HttpGet( "{id:guid}" )]
@@ -60,11 +52,11 @@ public class RoomTypeController : ControllerBase
         RoomType? roomType = await _roomTypeService.GetRoomTypeByIdAsync( id );
         if ( roomType == null )
         {
-            throw new HttpResponseException( 404, $"Room type with id {id} not found" );
+            throw new Exceptions.ValidationException( $"Room type with id {id} not found" );
         }
 
         CreatedRoomTypeDto? dto = _mapper.Map<CreatedRoomTypeDto>( roomType );
-        
+
         return Ok( dto );
     }
 
@@ -73,7 +65,7 @@ public class RoomTypeController : ControllerBase
     {
         IEnumerable<RoomType?> roomTypes = await _roomTypeService.GetAllRoomTypesAsync();
         IEnumerable<CreatedRoomTypeDto>? dtos = _mapper.Map<IEnumerable<CreatedRoomTypeDto>>( roomTypes );
-        
+
         return Ok( dtos );
     }
 
@@ -82,7 +74,7 @@ public class RoomTypeController : ControllerBase
     {
         IEnumerable<RoomType?> roomTypes = await _roomTypeService.GetRoomTypesByPropertyIdAsync( propertyId );
         IEnumerable<CreatedRoomTypeDto>? dtos = _mapper.Map<IEnumerable<CreatedRoomTypeDto>>( roomTypes );
-        
+
         return Ok( dtos );
     }
 
@@ -92,8 +84,8 @@ public class RoomTypeController : ControllerBase
         if ( !ModelState.IsValid )
         {
             IEnumerable<string> errors = ModelState.Values.SelectMany( v => v.Errors ).Select( e => e.ErrorMessage );
-            
-            throw new HttpResponseException( 400, string.Join( "; ", errors ) );
+
+            throw new Exceptions.ValidationException( string.Join( "; ", errors ) );
         }
 
         RoomType roomType = new()
@@ -105,19 +97,12 @@ public class RoomTypeController : ControllerBase
             MaxPersonCount = dto.MaxPersonCount,
             RoomsCount = dto.RoomsCount
         };
-        
-        try
-        {
-            RoomType? updatedRoomType =
-                await _roomTypeService.UpdateRoomTypeAsync( roomType, dto.CurrencyType, dto.Services, dto.Amenities );
-            CreatedRoomTypeDto? createdRoomTypeDto = _mapper.Map<CreatedRoomTypeDto>( updatedRoomType );
 
-            return Ok( createdRoomTypeDto );
-        }
-        catch ( ValidationException ex )
-        {
-            throw new HttpResponseException( 400, ex.Message );
-        }
+        RoomType? updatedRoomType =
+            await _roomTypeService.UpdateRoomTypeAsync( roomType, dto.CurrencyType, dto.Services, dto.Amenities );
+        CreatedRoomTypeDto? createdRoomTypeDto = _mapper.Map<CreatedRoomTypeDto>( updatedRoomType );
+
+        return Ok( createdRoomTypeDto );
     }
 
     [HttpDelete( "{id:guid}" )]
@@ -126,7 +111,7 @@ public class RoomTypeController : ControllerBase
         bool deleted = await _roomTypeService.DeleteRoomTypeAsync( id );
         if ( !deleted )
         {
-            throw new HttpResponseException( 404, $"Room type with id {id} not found" );
+            throw new ValidationException( $"Room type with id {id} not found" );
         }
 
         return Ok();

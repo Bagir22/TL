@@ -6,15 +6,15 @@ namespace Infrastructure.Storage.Configuration;
 
 public class AmenityConfiguration : IEntityTypeConfiguration<Amenity>
 {
-    public void Configure(EntityTypeBuilder<Amenity> builder)
+    public void Configure( EntityTypeBuilder<Amenity> builder )
     {
-        builder.HasKey(a => a.Id);
-        
-        builder.Property(a => a.Id)
+        builder.HasKey( a => a.Id );
+
+        builder.Property( a => a.Id )
             .ValueGeneratedOnAdd();
 
-        builder.Property(a => a.Name)
+        builder.Property( a => a.Name )
             .IsRequired()
-            .HasMaxLength(100);
+            .HasMaxLength( 100 );
     }
 }

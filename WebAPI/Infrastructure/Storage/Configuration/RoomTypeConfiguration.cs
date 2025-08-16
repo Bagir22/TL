@@ -19,17 +19,17 @@ public class RoomTypeConfiguration : IEntityTypeConfiguration<RoomType>
 
         builder.Property( rt => rt.DailyPrice ).IsRequired().HasColumnType( "decimal(9,2)" );
 
-        builder.HasOne(rt => rt.Currency)
-            .WithMany(c => c.RoomTypes)
-            .HasForeignKey(rt => rt.CurrencyId)
-            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne( rt => rt.Currency )
+            .WithMany( c => c.RoomTypes )
+            .HasForeignKey( rt => rt.CurrencyId )
+            .OnDelete( DeleteBehavior.Restrict );
 
         builder.Property( rt => rt.MinPersonCount ).IsRequired();
 
         builder.Property( rt => rt.MaxPersonCount ).IsRequired();
-        
-        builder.Property(rt => rt.RoomsCount).IsRequired();
-        
+
+        builder.Property( rt => rt.RoomsCount ).IsRequired();
+
         builder.HasCheckConstraint(
             "CK_RoomType_MinPersonCount_Positive",
             "[MinPersonCount] > 0"

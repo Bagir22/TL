@@ -2,9 +2,9 @@ namespace Domain.Entities;
 
 public class Currency
 {
-    public int Id { get; set; }            
-    public string Type { get; set; }     
-    
-    public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
-    public ICollection<RoomType> RoomTypes { get; set; } = new List<RoomType>();
+    public int Id { get; init; }
+    public required string Type { get; init; }
+
+    public ICollection<Reservation> Reservations { get; init; } = new List<Reservation>();
+    public ICollection<RoomType> RoomTypes { get; init; } = new List<RoomType>();
 }

@@ -21,55 +21,55 @@ public class RoomTypeRepository : IRoomTypeRepository
         }
 
         _context.RoomType.Add( roomType );
-        
+
         return roomType;
     }
 
     public async Task<RoomType?> GetRoomTypeByIdAsync( Guid id )
     {
         return await _context.RoomType
-            .Include(rt => rt.Currency)
-            .Include(rt => rt.RoomTypeServices)
-            .ThenInclude(rts => rts.Service)
-            .Include(rt => rt.RoomTypeAmenities)
-            .ThenInclude(rta => rta.Amenity)
-            .FirstOrDefaultAsync(rt => rt.Id == id);
+            .Include( rt => rt.Currency )
+            .Include( rt => rt.RoomTypeServices )
+            .ThenInclude( rts => rts.Service )
+            .Include( rt => rt.RoomTypeAmenities )
+            .ThenInclude( rta => rta.Amenity )
+            .FirstOrDefaultAsync( rt => rt.Id == id );
     }
-    
+
     public async Task<IEnumerable<RoomType?>> GetAllRoomTypesAsync()
     {
         return await _context.RoomType
-            .Include(rt => rt.Currency)
-            .Include(rt => rt.RoomTypeServices)
-            .ThenInclude(rts => rts.Service)
-            .Include(rt => rt.RoomTypeAmenities)
-            .ThenInclude(rta => rta.Amenity)
+            .Include( rt => rt.Currency )
+            .Include( rt => rt.RoomTypeServices )
+            .ThenInclude( rts => rts.Service )
+            .Include( rt => rt.RoomTypeAmenities )
+            .ThenInclude( rta => rta.Amenity )
             .ToListAsync();
     }
 
     public async Task<IEnumerable<RoomType?>> GetRoomTypesByPropertyIdAsync( Guid propertyId )
     {
         return await _context.RoomType
-            .Where(rt => rt.PropertyId == propertyId)
-            .Include(rt => rt.Currency)
-            .Include(rt => rt.RoomTypeServices)
-            .ThenInclude(rts => rts.Service)
-            .Include(rt => rt.RoomTypeAmenities)
-            .ThenInclude(rta => rta.Amenity)
+            .Where( rt => rt.PropertyId == propertyId )
+            .Include( rt => rt.Currency )
+            .Include( rt => rt.RoomTypeServices )
+            .ThenInclude( rts => rts.Service )
+            .Include( rt => rt.RoomTypeAmenities )
+            .ThenInclude( rta => rta.Amenity )
             .ToListAsync();
     }
 
-    public async Task UpdateRoomTypeAsync(RoomType roomType, IEnumerable<string> serviceNames, IEnumerable<string> amenityNames)
+    public async Task UpdateRoomTypeAsync( RoomType roomType )
     {
         RoomType? entity = await _context.RoomType
-            .Include(rt => rt.RoomTypeServices)
-            .ThenInclude(rts => rts.Service)
-            .Include(rt => rt.RoomTypeAmenities)
-            .ThenInclude(rta => rta.Amenity)
-            .FirstOrDefaultAsync(rt => rt.Id == roomType.Id);
+            .Include( rt => rt.RoomTypeServices )
+            .ThenInclude( rts => rts.Service )
+            .Include( rt => rt.RoomTypeAmenities )
+            .ThenInclude( rta => rta.Amenity )
+            .FirstOrDefaultAsync( rt => rt.Id == roomType.Id );
 
-        if (entity == null)
-            throw new InvalidOperationException("RoomType not found");
+        if ( entity == null )
+            throw new InvalidOperationException( "RoomType not found" );
 
         entity.Name = roomType.Name;
         entity.DailyPrice = roomType.DailyPrice;
@@ -77,48 +77,20 @@ public class RoomTypeRepository : IRoomTypeRepository
         entity.MaxPersonCount = roomType.MaxPersonCount;
         entity.RoomsCount = roomType.RoomsCount;
         entity.CurrencyId = roomType.CurrencyId;
-        
+
         entity.RoomTypeServices.Clear();
-        foreach (string serviceName in serviceNames.Distinct())
+        foreach ( RoomTypeService rts in roomType.RoomTypeServices )
         {
-            Service? service = await _context.Service.FirstOrDefaultAsync(s => s.Name == serviceName);
-            if (service == null)
-            {
-                service = new Service { Name = serviceName };
-                _context.Service.Add(service);
-                await _context.SaveChangesAsync();
-            }
-
-            _context.Attach(service);
-            entity.RoomTypeServices.Add(new RoomTypeService
-            {
-                RoomTypeId = entity.Id,
-                ServiceId = service.Id
-            });
+            entity.RoomTypeServices.Add( rts );
         }
-        
+
         entity.RoomTypeAmenities.Clear();
-        foreach (string amenityName in amenityNames.Distinct())
+        foreach ( RoomTypeAmenity rta in roomType.RoomTypeAmenities )
         {
-            Amenity? amenity = await _context.Amenity.FirstOrDefaultAsync(a => a.Name == amenityName);
-            if (amenity == null)
-            {
-                amenity = new Amenity { Name = amenityName };
-                _context.Amenity.Add(amenity);
-                await _context.SaveChangesAsync();
-            }
-
-            _context.Attach(amenity);
-            entity.RoomTypeAmenities.Add(new RoomTypeAmenity
-            {
-                RoomTypeId = entity.Id,
-                AmenityId = amenity.Id
-            });
+            entity.RoomTypeAmenities.Add( rta );
         }
-
-        await _context.SaveChangesAsync();
     }
-    
+
     public async Task DeleteRoomTypeAsync( Guid id )
     {
         RoomType? roomType = await _context.RoomType.FirstOrDefaultAsync( rt => rt.Id == id );

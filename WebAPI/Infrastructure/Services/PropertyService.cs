@@ -39,7 +39,7 @@ public class PropertyService : IPropertyService
         Property? property = await _propertyRepository.GetPropertyByIdAsync( id );
         if ( property == null )
         {
-            return null;
+            throw new Exception( $"Property with id: {id} not found" );
         }
 
         property.Name = updatedProperty.Name;
@@ -49,7 +49,7 @@ public class PropertyService : IPropertyService
         property.Latitude = updatedProperty.Latitude;
         property.Longitude = updatedProperty.Longitude;
 
-        await _propertyRepository.UpdatePropertyAsync(property);
+        await _propertyRepository.UpdatePropertyAsync( property );
         await _unitOfWork.CommitAsync();
 
         return property;
