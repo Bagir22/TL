@@ -1,0 +1,73 @@
+import styles from "./Form.module.css";
+import angry from "../../assets/images/emojies/twemoji_angry-face.svg";
+import frown from "../../assets/images/emojies/twemoji_slightly-frowning-face.svg";
+import neutral from "../../assets/images/emojies/twemoji_neutral-face.svg";
+import smile from "../../assets/images/emojies/twemoji_slightly-smiling-face.svg";
+import grin from "../../assets/images/emojies/twemoji_grinning-face-with-big-eyes.svg";
+
+import {type FormEvent, useState} from "react";
+
+function Form() {
+    const [activeEmoji, setActiveEmoji] = useState<number | null>(null);
+
+    const emojies = [
+        { src: angry, alt: "Angry emoji" },
+        { src: frown, alt: "Frown emoji" },
+        { src: neutral, alt: "Neutral emoji" },
+        { src: smile, alt: "Smile emoji" },
+        { src: grin, alt: "Grinning emoji" },
+    ];
+
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        console.log({ activeEmoji });
+        alert("Спасибо за отзыв!");
+    };
+
+    return (
+        <div className={styles.container}>
+            <h5 className={styles.title}>
+                Помогите нам сделать процесс бронирования лучше
+            </h5>
+
+            <div className={styles.emojiesList}>
+                {emojies.map((emoji, index) => (
+                    <button
+                        key={index}
+                        type="button"
+                        className={` ${styles.emojiButton} ${activeEmoji === index + 1 ? styles.active : ""}`}
+                        onClick={() => setActiveEmoji(index + 1)}
+                    >
+                        <img src={emoji.src} alt={emoji.alt}/>
+                    </button>
+                ))}
+            </div>
+
+            <form className={styles.form} onSubmit={handleSubmit}>
+                <div className={styles.inputBox}>
+                    <label className={styles.labelName}>*Имя</label>
+                    <input
+                        type="text"
+                        placeholder="Как вас зовут?"
+                        className={`${styles.input} ${styles.inputName}`}
+                        required
+                    />
+                </div>
+
+                <textarea
+                    placeholder="Напишите, что понравилось, что было непонятно"
+                    className={`${styles.textarea} ${styles.textareaReview}`}
+                    required
+                />
+
+                <div className={styles.buttonBox}>
+                    <button type="submit" className={styles.submitBtn}>
+                        Отправить
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
+}
+
+export default Form;
