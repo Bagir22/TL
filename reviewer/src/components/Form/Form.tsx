@@ -6,9 +6,16 @@ import smile from "../../assets/images/emojies/twemoji_slightly-smiling-face.svg
 import grin from "../../assets/images/emojies/twemoji_grinning-face-with-big-eyes.svg";
 
 import {type FormEvent, useState} from "react";
+import type {ReviewData} from "../../types/ReviewData.ts";
 
-function Form() {
+type FormProps = {
+    onAddReview: (review: ReviewData) => void;
+};
+
+function Form({ onAddReview }: FormProps) {
     const [activeEmoji, setActiveEmoji] = useState<number | null>(null);
+    const [name, setName] = useState("");
+    const [review, setReview] = useState("");
 
     const emojies = [
         { src: angry, alt: "Angry emoji" },
@@ -20,8 +27,24 @@ function Form() {
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log({ activeEmoji });
-        alert("Спасибо за отзыв!");
+
+        if (!activeEmoji) {
+            alert("Пожалуйста, выберите оценку");
+            return;
+        }
+
+        const newReview: ReviewData = {
+            guid: crypto.randomUUID(),
+            name,
+            comment: review,
+            rating: activeEmoji,
+        };
+
+        onAddReview(newReview);
+
+        setActiveEmoji(null);
+        setName("");
+        setReview("");
     };
 
     return (
@@ -50,12 +73,16 @@ function Form() {
                         type="text"
                         placeholder="Как вас зовут?"
                         className={`${styles.input} ${styles.inputName}`}
+                        value={name}
+                        onChange={e => setName(e.target.value)}
                         required
                     />
                 </div>
 
                 <textarea
                     placeholder="Напишите, что понравилось, что было непонятно"
+                    value={review}
+                    onChange={e => setReview(e.target.value)}
                     className={`${styles.textarea} ${styles.textareaReview}`}
                     required
                 />

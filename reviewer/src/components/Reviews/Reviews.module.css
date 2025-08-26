@@ -1,0 +1,49 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.reviewCard {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 55px;
+    gap: 15px;
+}
+
+.customerIcon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.reviewText {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 15px 0 0 18px;
+}
+
+.name {
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+}
+
+.comment {
+    margin-top: 8px;
+    text-align: start;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #555;
+    white-space: pre-line;
+}
+
+.reviewRating {
+    font-weight: 500;
+    font-size: 24px;
+    letter-spacing: 0.01em;
+    color: #404040;
+    margin-left: auto;
+}
