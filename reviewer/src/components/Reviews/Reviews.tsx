@@ -1,31 +1,19 @@
-import styles from "./Reviews.module.css";
-import type {ReviewData} from "../../types/ReviewData.ts";
-import defaultAvatar from "../../assets/images/customerIcon.jpg";
+import styles from './Reviews.module.css';
+import type { ReviewData } from '../../types/ReviewData.ts';
+import ReviewCard from '../ReviewCard/ReviewCard.tsx';
 
 type ReviewsDataProps = {
-    reviews: ReviewData[]
-}
+  reviews: ReviewData[];
+};
 
-function Reviews({reviews}: ReviewsDataProps) {
-    return(
-        <div className={styles.container}>
-            {reviews.map((review) => (
-                <div key={review.id} className={styles.reviewCard}>
-                    <img
-                        src={defaultAvatar}
-                        alt="Customer Icon"
-                        className={styles.customerIcon}
-                    />
-                    <div className={styles.reviewText}>
-                        <h4 className={styles.name}>{review.name}</h4>
-                        <p className={styles.comment}>{review.comment}</p>
-                    </div>
-
-                    <p className={styles.reviewRating}>{review.rating}/5</p>
-                </div>
-            ))}
-        </div>
-    )
+function Reviews({ reviews }: ReviewsDataProps) {
+  return (
+    <div className={styles.container}>
+      {reviews.map((review) => (
+        <ReviewCard key={review.guid} review={review} />
+      ))}
+    </div>
+  );
 }
 
 export default Reviews;

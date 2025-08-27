@@ -1,100 +1,94 @@
-import styles from "./Form.module.css";
-import angry from "../../assets/images/emojies/twemoji_angry-face.svg";
-import frown from "../../assets/images/emojies/twemoji_slightly-frowning-face.svg";
-import neutral from "../../assets/images/emojies/twemoji_neutral-face.svg";
-import smile from "../../assets/images/emojies/twemoji_slightly-smiling-face.svg";
-import grin from "../../assets/images/emojies/twemoji_grinning-face-with-big-eyes.svg";
-
-import {type FormEvent, useState} from "react";
-import type {ReviewData} from "../../types/ReviewData.ts";
+import styles from './Form.module.css';
+import { type FormEvent, useState } from 'react';
+import type { ReviewData } from '../../types/ReviewData.ts';
+import InputField from './InputField/InputField.tsx';
+import TextareaField from './TextareaField/TextareaField.tsx';
+import Button from './Button/Button.tsx';
+import RatingPart from './RatingPart/RatingPart.tsx';
 
 type FormProps = {
-    onAddReview: (review: ReviewData) => void;
+  onAddReview: (review: ReviewData) => void;
 };
 
+const ratingCategories = [
+  'Чистенько',
+  'Сервис',
+  'Скорость',
+  'Место',
+  'Культура речи',
+];
+
 function Form({ onAddReview }: FormProps) {
-    const [activeEmoji, setActiveEmoji] = useState<number | null>(null);
-    const [name, setName] = useState("");
-    const [review, setReview] = useState("");
+  const [ratings, setRatings] = useState<Record<string, number>>({});
+  const [name, setName] = useState('');
+  const [comment, setComment] = useState('');
 
-    const emojies = [
-        { src: angry, alt: "Angry emoji" },
-        { src: frown, alt: "Frown emoji" },
-        { src: neutral, alt: "Neutral emoji" },
-        { src: smile, alt: "Smile emoji" },
-        { src: grin, alt: "Grinning emoji" },
-    ];
+  const handleRatingChange = (label: string, value: number) => {
+    setRatings((prev) => ({ ...prev, [label]: value }));
+  };
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-        if (!activeEmoji) {
-            alert("Пожалуйста, выберите оценку");
-            return;
-        }
+    const allRated = ratingCategories.every((category) => ratings[category]);
+    if (!allRated) {
+      alert('Пожалуйста, оцените все категории');
 
-        const newReview: ReviewData = {
-            guid: crypto.randomUUID(),
-            name,
-            comment: review,
-            rating: activeEmoji,
-        };
+      return;
+    }
 
-        onAddReview(newReview);
+    const values = Object.values(ratings);
+    const average =
+      values.reduce((total, value) => total + value, 0) / values.length;
 
-        setActiveEmoji(null);
-        setName("");
-        setReview("");
+    const newReview: ReviewData = {
+      guid: crypto.randomUUID(),
+      name,
+      comment: comment,
+      rating: Number(average.toFixed(1)),
     };
 
-    return (
-        <div className={styles.container}>
-            <h5 className={styles.title}>
-                Помогите нам сделать процесс бронирования лучше
-            </h5>
+    onAddReview(newReview);
 
-            <div className={styles.emojiesList}>
-                {emojies.map((emoji, index) => (
-                    <button
-                        key={index}
-                        type="button"
-                        className={` ${styles.emojiButton} ${activeEmoji === index + 1 ? styles.active : ""}`}
-                        onClick={() => setActiveEmoji(index + 1)}
-                    >
-                        <img src={emoji.src} alt={emoji.alt}/>
-                    </button>
-                ))}
-            </div>
+    setName('');
+    setComment('');
+    setRatings({});
+  };
 
-            <form className={styles.form} onSubmit={handleSubmit}>
-                <div className={styles.inputBox}>
-                    <label className={styles.labelName}>*Имя</label>
-                    <input
-                        type="text"
-                        placeholder="Как вас зовут?"
-                        className={`${styles.input} ${styles.inputName}`}
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        required
-                    />
-                </div>
+  return (
+    <div className={styles.container}>
+      <h5 className={styles.title}>
+        Помогите нам сделать процесс бронирования лучше
+      </h5>
 
-                <textarea
-                    placeholder="Напишите, что понравилось, что было непонятно"
-                    value={review}
-                    onChange={e => setReview(e.target.value)}
-                    className={`${styles.textarea} ${styles.textareaReview}`}
-                    required
-                />
+      {ratingCategories.map((category) => (
+        <RatingPart
+          key={category}
+          label={category}
+          value={ratings[category]}
+          onChange={(value) => handleRatingChange(category, value)}
+        />
+      ))}
 
-                <div className={styles.buttonBox}>
-                    <button type="submit" className={styles.submitBtn}>
-                        Отправить
-                    </button>
-                </div>
-            </form>
-        </div>
-    );
+      <form className={styles.form} onSubmit={handleSubmit}>
+        <InputField
+          label={`*Имя`}
+          placeholder={`Как вас зовут?`}
+          value={name}
+          onChange={setName}
+          required={true}
+        />
+
+        <TextareaField
+          placeholder="Напишите, что понравилось, что было непонятно"
+          value={comment}
+          onChange={setComment}
+        />
+
+        <Button type="submit">Отправить</Button>
+      </form>
+    </div>
+  );
 }
 
 export default Form;

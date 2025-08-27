@@ -1,12 +1,12 @@
-import Reviewer from "./components/Reviewer/Reviewer.tsx";
-import './App.css'
+import Reviewer from './components/Reviewer/Reviewer.tsx';
+import './App.css';
 
 function App() {
-    return (
+  return (
     <>
-      <Reviewer/>
+      <Reviewer />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
