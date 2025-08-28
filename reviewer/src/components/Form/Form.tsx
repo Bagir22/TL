@@ -5,6 +5,7 @@ import InputField from './InputField/InputField.tsx';
 import TextareaField from './TextareaField/TextareaField.tsx';
 import Button from './Button/Button.tsx';
 import RatingPart from './RatingPart/RatingPart.tsx';
+import { createReview } from '../../utils/createReview.ts';
 
 type FormProps = {
   onAddReview: (review: ReviewData) => void;
@@ -37,18 +38,7 @@ function Form({ onAddReview }: FormProps) {
       return;
     }
 
-    const values = Object.values(ratings);
-    const average =
-      values.reduce((total, value) => total + value, 0) / values.length;
-
-    const newReview: ReviewData = {
-      guid: crypto.randomUUID(),
-      name,
-      comment: comment,
-      rating: Number(average.toFixed(1)),
-    };
-
-    onAddReview(newReview);
+    onAddReview(createReview(name, comment, ratings));
 
     setName('');
     setComment('');

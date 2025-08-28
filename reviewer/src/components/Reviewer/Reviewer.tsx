@@ -1,23 +1,14 @@
 import Form from '../Form/Form.tsx';
 import styles from './Reviewer.module.css';
-import { useState } from 'react';
 import type { ReviewData } from '../../types/ReviewData.ts';
 import Reviews from '../Reviews/Reviews.tsx';
+import { useLocalStorage } from '../../hooks/useLocalStorage.ts';
 
 function Reviewer() {
-  const [reviews, setReviews] = useState<ReviewData[]>(() => {
-    const saved = localStorage.getItem('reviews');
-
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [reviews, setReviews] = useLocalStorage<ReviewData[]>('reviews', []);
 
   const addReview = (newReview: ReviewData) => {
-    setReviews((existing) => {
-      const updated = [...existing, newReview];
-      localStorage.setItem('reviews', JSON.stringify(updated));
-
-      return updated;
-    });
+    setReviews(existing => [...existing, newReview]);
   };
 
   return (
