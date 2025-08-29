@@ -1,0 +1,20 @@
+.point {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+}
+
+.point:hover:not(.isSelected) {
+  transform: scale(1.2);
+}
+
+.isSelected {
+  transform: scale(1.4);
+}
+
+.emoji {
+  width: 16px;
+  height: 16px;
+}

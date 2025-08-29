@@ -1,0 +1,25 @@
+.container {
+  max-width: 481px;
+  margin: 0 auto;
+  padding: 25px 86px 69px 76px;
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid #dcdcdc;
+  box-shadow: 0 2px 1px 0 rgba(171, 171, 171, 0.25);
+  text-align: justify;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-align-last: left;
+  color: #404040;
+  margin: 25px 0 0 0;
+  max-width: 394px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
