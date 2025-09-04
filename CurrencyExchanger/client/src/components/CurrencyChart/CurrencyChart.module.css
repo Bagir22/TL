@@ -1,0 +1,40 @@
+.chartContainer {
+    width: 400px;
+    height: 200px;
+    border-radius: 12px;
+    padding-right: 20px;
+    margin: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-sizing: border-box;
+}
+
+.intervalSelector {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    height: 30px;
+}
+
+.chartWrapper {
+    height: 150px;
+    position: relative;
+    width: 100%;
+}
+
+.intervalButton {
+    padding: 4px 8px;
+    border: none;
+    background: rgba(198, 198, 198, 0.35);
+    color: #1c1c1c;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.active {
+    color: #0719e6;
+    font-size: 16px;
+}
