@@ -1,0 +1,15 @@
+.wrapper {
+    margin: 10px 60px;
+}
+
+.title {
+    font-weight: 800;
+    font-size: 20px;
+    color: black;
+}
+
+.description {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(58, 58, 62, 0.73);
+}
