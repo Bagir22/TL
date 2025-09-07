@@ -1,14 +1,20 @@
 import { Button, Box, Typography, Card, CardContent } from '@mui/material';
-import { useNavigate } from 'react-router';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+import { useWords } from '../../hooks/useWords.ts';
+import { useNavigate } from 'react-router';
 
-export const Result = () => {
+export const ResultPage = () => {
   const navigate = useNavigate();
+  const { lastResult } = useWords();
 
-  const handleDictionaryClick = () => {
-    navigate('/dictionary');
+  const correct = lastResult?.correct ?? 0;
+  const total = lastResult?.total ?? 0;
+  const wrong = total - correct;
+
+  const handleStartClick = () => {
+    navigate('/');
   };
 
   const handleCheclKnowledgeClick = () => {
@@ -49,7 +55,7 @@ export const Result = () => {
               </Typography>
             </Box>
             <Typography variant="body1" sx={{ fontWeight: 600 }}>
-              5
+              {correct}
             </Typography>
           </Box>
           <Box
@@ -68,7 +74,7 @@ export const Result = () => {
               </Typography>
             </Box>
             <Typography variant="body1" sx={{ fontWeight: 600 }}>
-              5
+              {wrong}
             </Typography>
           </Box>
           <Box
@@ -87,7 +93,7 @@ export const Result = () => {
               </Typography>
             </Box>
             <Typography variant="body1" sx={{ fontWeight: 600 }}>
-              5
+              {total}
             </Typography>
           </Box>
         </CardContent>
@@ -96,11 +102,7 @@ export const Result = () => {
         <Button variant="contained" onClick={handleCheclKnowledgeClick}>
           Проверить знания еще раз
         </Button>
-        <Button
-          variant="outlined"
-          onClick={handleDictionaryClick}
-          sx={{ ml: 1 }}
-        >
+        <Button variant="outlined" onClick={handleStartClick} sx={{ ml: 1 }}>
           Вернуться в начало
         </Button>
       </Box>

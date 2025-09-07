@@ -1,25 +1,28 @@
 import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { HomePage } from './components/HomePage/HomePage.tsx';
-import { Dictionary } from './components/Dictionary/Dictionary.tsx';
-import { AddWord } from './components/AddWord/AddWord.tsx';
-import { EditWord } from './components/EditWord/EditWord.tsx';
-import { CheckKnowledge } from './components/CheckKnowledge/CheckKnowledge.tsx';
-import { Result } from './components/Result/Result.tsx';
+import { DictionaryPage } from './components/DictionaryPage/DictionaryPage.tsx';
+import { AddWordPage } from './components/AddWordPage/AddWordPage.tsx';
+import { EditWordPage } from './components/EditWordPage/EditWordPage.tsx';
+import { CheckKnowledgePage } from './components/CheckKnowledgePage/CheckKnowledgePage.tsx';
+import { ResultPage } from './components/ResultPage/ResultPage.tsx';
+import { WordsProvider } from './WordsProvider.tsx';
 
 function App() {
   return (
     <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" Component={HomePage}></Route>
-          <Route path="/dictionary" Component={Dictionary} />
-          <Route path="/new-word" Component={AddWord} />
-          <Route path="/edit-word" Component={EditWord} />
-          <Route path="/check" Component={CheckKnowledge} />
-          <Route path="/result" Component={Result} />
-        </Routes>
-      </BrowserRouter>
+      <WordsProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/dictionary" element={<DictionaryPage />} />
+            <Route path="/new-word" element={<AddWordPage />} />
+            <Route path="/edit-word/:id" element={<EditWordPage />} />
+            <Route path="/check" element={<CheckKnowledgePage />} />
+            <Route path="/result" element={<ResultPage />} />
+          </Routes>
+        </BrowserRouter>
+      </WordsProvider>
     </>
   );
 }
