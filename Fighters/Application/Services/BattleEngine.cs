@@ -26,6 +26,8 @@ public class BattleEngine : IBattleEngine
         if ( !HasEnoughFighters() )
         {
             _console.WriteLine( $"Недостаточно бойцов для начала боя\nТекущее количество бойцов - {_fighters.Count}" );
+            _deleteFightersCommand.Execute();
+            
             return;
         }
 
@@ -36,13 +38,13 @@ public class BattleEngine : IBattleEngine
         {
             _console.WriteLine( $"Раунд {round++}" );
 
-            var aliveFighters = _fighters
+            List<IFighter> aliveFighters = _fighters
                 .Where( f => f.IsAlive )
                 .OrderByDescending( f => f.Initiative )
                 .ToList();
 
-            var attacker = aliveFighters[ 0 ];
-            var defender = aliveFighters[ 1 ];
+            IFighter attacker = aliveFighters[ 0 ];
+            IFighter defender = aliveFighters[ 1 ];
 
             bool isDamageTaken = MakeAttack( attacker, defender );
 

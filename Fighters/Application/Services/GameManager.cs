@@ -30,7 +30,7 @@ public class GameManager
                 break;
             }
 
-            if (!_commands.TryGetValue((Command)command, out var cmd))
+            if (!_commands.TryGetValue((Command)command, out ICommand? cmd))
             {
                 Console.WriteLine("Неизвестная или не реализованная команда");
                 continue;

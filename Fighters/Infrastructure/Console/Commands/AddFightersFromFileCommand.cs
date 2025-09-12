@@ -12,8 +12,7 @@ public class AddFightersFromFileCommand( List<IFighter> fighters, IConsoleServic
     {
         console.Write( "Введите путь к JSON файлу с бойцами: " );
         string? path = console.ReadLine();
-
-
+        
         try
         {
             List<IFighter> loaded = FighterLoader.LoadFightersFromJson( path, random );
