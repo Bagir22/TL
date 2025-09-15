@@ -1,0 +1,9 @@
+.footer {
+    display: flex;
+    flex: 0 0 auto;
+    height: 5em;
+    justify-content: center;
+    align-items: center;
+    background-color: #1a1535;
+    color: beige;
+}

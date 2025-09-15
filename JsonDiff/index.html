@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Json diff</title>
+    <link rel="stylesheet" href="./src/styles/main.css" />
+    <link rel="stylesheet" href="./src/styles/header.css" />
+    <link rel="stylesheet" href="./src/styles/footer.css" />
+  </head>
+  <body>
+      <div class="wrapper">
+          <header class="header">
+              <span class="header__title">JSON-DIFF</span>
+              <div class="header__auth">
+                  <span class="header__greeting"></span>
+                  <button class="header__auth-btn">Log in</button>
+              </div>
+          </header>
+
+          <main class="content">
+              <div class="promo">
+                  <p class="promo__text">
+                      Compare <span class="promo_text-red promo__text--bold">two JSON objects</span> and see the
+                      <br><span class="promo_text-orange promo__text--bold">differences</span>
+                  </p>
+                  <button class="promo__start-btn">Start</button>
+              </div>
+
+              <form class="login-form">
+                  <span class="login-form__title">Login Form</span>
+                  <div class="login-form__input-group">
+                      <div class="login-form__input-row">
+                          <label class="login-form__label">Login</label>
+                          <div class="login-form__input-wrapper">
+                              <input type="text" class="login-form__input" placeholder="Your name" required />
+                              <span class="login-form__error-message">Обязательное поле</span>
+                          </div>
+                      </div>
+                  </div>
+                  <button class="login-form__submit" type="submit">SIGN IN</button>
+              </form>
+
+              <form class="json-form">
+                  <div class="json-form__inputs">
+                      <div class="json-form__input-row">
+                          <label class="json-form__label" for="oldJson">OLD JSON</label>
+                          <div class="json-form__input-wrapper">
+                              <textarea class="json-form__textarea" id="oldJson" name="oldJson" placeholder="Old JSON Value" required></textarea>
+                              <span class="json-form__error-message"></span>
+                          </div>
+                      </div>
+
+                      <div class="json-form__input-row">
+                          <label class="json-form__label" for="newJson">NEW JSON</label>
+                          <div class="json-form__input-wrapper">
+                              <textarea class="json-form__textarea" id="newJson" name="newJson" placeholder="New JSON Value" required></textarea>
+                              <span class="json-form__error-message"></span>
+                          </div>
+                      </div>
+                  </div>
+                  <button class="json-form__submit" type="submit">Show difference</button>
+                  <pre class="json-form__result"></pre>
+              </form>
+          </main>
+
+          <footer class="footer">Copyright 2025 ©</footer>
+      </div>
+  <script type="module" src="./src/scripts/index.js"></script>
+  </body>
+</html>
