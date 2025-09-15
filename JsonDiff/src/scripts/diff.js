@@ -1,8 +1,6 @@
 "use strict";
 
 const calculate = (oldObj, newObj) => {
-  console.log(oldObj);
-  console.log(newObj);
   const keys = [...new Set([...Object.keys(oldObj), ...Object.keys(newObj)])];
   let result;
 

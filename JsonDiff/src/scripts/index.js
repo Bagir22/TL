@@ -1,5 +1,3 @@
-"use strict";
-
 import { Auth } from "./auth.js";
 import { Diff } from "./diff.js";
 
